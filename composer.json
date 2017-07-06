@@ -1,0 +1,19 @@
+{
+    "name": "kilroyweb/homeboy",
+    "description": "Tool for automating sites using Laravel Homestead",
+    "authors": [
+        {
+            "name": "Jeff Kilroy",
+            "email": "jeffkilroy@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/console": "^3.3",
+        "vlucas/phpdotenv": "^2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+}

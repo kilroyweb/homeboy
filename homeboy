@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+
+$dotenv = new Dotenv\Dotenv(__DIR__, '.env');
+$dotenv->load();
+
+$application = new Application();
+
+$hostCommand = new \App\Commands\Host();
+
+$application->add($hostCommand);
+
+$application->setDefaultCommand($hostCommand->getName());
+
+$application->run();
