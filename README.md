@@ -7,6 +7,8 @@ Tool for automating sites using Laravel Homestead. With one command, Homeboy wil
 - Update your Homestead.yaml file to create a database for your project
 - Re-provision Vagrant
 
+![](https://j.gifs.com/y8KL0n.gif)
+
 ## Installation + First Time Setup
 
 *Requires Git, PHP, and Composer installed on your local (non-homestead machine)*
