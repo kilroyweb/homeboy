@@ -26,7 +26,7 @@ cd homeboy
 composer install
 ```
 
-- Copy one of the .env.example files to .env, and update it with your information
+- Copy one of the .env.example files to a new file called `.env` and update it with your information
 
 **By this point, you should be able to run homeboy within the directory using the command:**
 
