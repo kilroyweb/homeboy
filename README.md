@@ -56,6 +56,8 @@ homeboy=php C:\Users\[USER]\homeboy\homeboy $*
 homeboy
 ```
 
+*As of 1.0.1, homeboy will use composer to install laravel to a new directory as well*
+
 Running this command automates the task of updating your hosts file and vagrant files when provisioning a new website
 
 When the command runs, it prompts for the sites directory name, database name, and dev url to update the needed files and then provisions vagrant
