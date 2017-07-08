@@ -15,6 +15,8 @@ class Host extends Command
     private $inputInterface;
     private $outputInterface;
 
+    private $name;
+    private $composerProject;
     private $folder;
     private $folderSuffix;
     private $database;
@@ -43,7 +45,9 @@ class Host extends Command
     }
 
     private function updateFromConfig(){
+        $this->folder = getenv('PROJECTS_FOLDER');
         $this->folderSuffix = getenv('DEFAULT_FOLDER_SUFFIX');
+        $this->composerProject = getenv('DEFAULT_COMPOSER_PROJECT');
         $this->hostPath = getenv('HOSTS_FILE_PATH');
         $this->hostIP = getenv('HOMESTEAD_HOST_IP');
         $this->homesteadPath = getenv('HOMESTEAD_FILE_PATH');
@@ -57,17 +61,23 @@ class Host extends Command
     {
         $this->init($input, $output);
 
-        $this->folder = $this->getFolderFromQuestion();
-        if(empty($this->folder)){
-            $output->writeln('<error>Host creation failed. No folder set</error>');
-            return;
-        }
+        $this->name = $this->getNameFromQuestion();
 
-        $this->folderSuffix = $this->getFolderSuffixFromQuestion();
+        $this->composerProject = $this->getComposerProjectFromQuestion();
+
+        $this->folder = $this->getFolderFromQuestion();
+
+        if($this->composerProject != 'laravel/laravel')
+        {
+            $this->folderSuffix = $this->getFolderSuffixFromQuestion();
+        }
 
         $this->database = $this->getDatabaseFromQuestion();
 
         $this->domain = $this->getDomainFromQuestion();
+
+        $output->writeln('<info>Creating project..</info>');
+        $this->createProject();
 
         $output->writeln('<info>Create host ('.$this->domain.')...</info>');
         $this->updateHostsFile();
@@ -83,33 +93,41 @@ class Host extends Command
 
         $output->writeln('<success>Complete!</success>');
 
+        $output->writeln('Visit: http://' . $this->domain);
+
         return;
 
     }
 
-    private function getFolderFromQuestion(){
-        $question = new Question('Folder Name (Leave blank to cancel): ', false);
+    private function getNameFromQuestion(){
+        $question = new Question('What is your project\'s name? ', 'project-' . time());
         return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
     }
 
-    private function getFolderSuffixFromQuestion(){
-        $question = new ConfirmationQuestion('Point site to '.$this->folderSuffix.' suffix? (yes)', true);
-        $response = $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
-        if(!$response){
-            return '';
-        }
-        return $this->folderSuffix;
+    private function getComposerProjectFromQuestion(){
+        $question = new Question("What composer project? ({$this->composerProject}): ", $this->composerProject);
+        return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
+    }
+
+    private function getFolderFromQuestion(){
+        $question = new Question("What is your project's folder? ($this->folder): ", $this->folder);
+        return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
+    }
+
+    private function getFolderSuffixFromQuestion(){        
+        $question = new Question("Point site to? ({$this->folderSuffix}): ", $this->folderSuffix);
+        return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
     }
 
     private function getDatabaseFromQuestion(){
-        $default = $this->defaultDatabaseNameFromKey($this->folder);
-        $question = new Question('Database Name: ('.$default.') ', $default);
+        $default = $this->defaultDatabaseNameFromKey($this->name);
+        $question = new Question('Database Name? ('.$default.'): ', $default);
         return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
     }
 
     private function getDomainFromQuestion(){
         $default = $this->defaultDomainNameFromKey($this->database);
-        $question = new Question('Development Domain: ('.$default.')', $default);
+        $question = new Question('Development Domain? ('.$default.'): ', $default);
         return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
     }
 
@@ -128,6 +146,11 @@ class Host extends Command
         return $key;
     }
 
+    private function createProject()
+    {
+        $shellOutput = shell_exec("cd {$this->folder} && composer create-project {$this->composerProject} {$this->name}");
+    }
+
     private function updateHostsFile(){
         $hostAppendLine = $this->hostIP.' '.$this->domain;
         file_put_contents($this->hostPath, PHP_EOL.$hostAppendLine, FILE_APPEND | LOCK_EX);
@@ -137,7 +160,7 @@ class Host extends Command
         $homesteadContents = file_get_contents($this->homesteadPath);
         $tabSpacing = "    ";
         $mapLine = $tabSpacing."- map: ".$this->domain;
-        $toLine = $tabSpacing."  to: ".$this->homesteadSitesPath.$this->folder.$this->folderSuffix;
+        $toLine = $tabSpacing."  to: ".$this->homesteadSitesPath.$this->name.$this->folderSuffix;
         $newLines = $mapLine.PHP_EOL.$toLine;
         $search = "sites:";
         $homesteadContents = str_replace($search,$search.PHP_EOL.$newLines,$homesteadContents);
@@ -157,6 +180,8 @@ class Host extends Command
         if(!is_null($this->homesteadProvisionCommand)){
             $shellOutput = shell_exec($this->homesteadProvisionCommand);
         }else{
+            var_dump('cd '.$this->homesteadBoxPath.' && vagrant provision'); die;
+
             $shellOutput = shell_exec('cd '.$this->homesteadBoxPath.' && vagrant provision');
         }
     }
