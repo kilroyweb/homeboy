@@ -17,6 +17,7 @@ class Host extends Command
 
     private $name;
     private $composerProject;
+    private $useComposer;
     private $folder;
     private $folderSuffix;
     private $database;
@@ -38,15 +39,16 @@ class Host extends Command
     }
 
     private function init(InputInterface $input, OutputInterface $output){
-        $this->updateFromConfig();
         $this->inputInterface = $input;
         $this->outputInterface = $output;
+        $this->updateFromConfig();
         $this->questionHelper = $this->getHelper('question');
     }
 
     private function updateFromConfig(){
-        $this->folder = getenv('PROJECTS_FOLDER');
+        $this->folder = getenv('LOCAL_SITES_PATH');
         $this->folderSuffix = getenv('DEFAULT_FOLDER_SUFFIX');
+        $this->useComposer = boolval(getenv('USE_COMPOSER'));
         $this->composerProject = getenv('DEFAULT_COMPOSER_PROJECT');
         $this->hostPath = getenv('HOSTS_FILE_PATH');
         $this->hostIP = getenv('HOMESTEAD_HOST_IP');
@@ -63,7 +65,9 @@ class Host extends Command
 
         $this->name = $this->getNameFromQuestion();
 
-        $this->composerProject = $this->getComposerProjectFromQuestion();
+        if($this->useComposer){
+            $this->composerProject = $this->getComposerProjectFromQuestion();
+        }
 
         $this->folder = $this->getFolderFromQuestion();
 
@@ -76,13 +80,15 @@ class Host extends Command
 
         $this->domain = $this->getDomainFromQuestion();
 
-        $output->writeln('<info>Creating project..</info>');
-        $this->createProject();
+        if($this->useComposer && !empty($this->composerProject)){
+            $output->writeln('<info>Creating project..</info>');
+            $this->createProject();
+        }
 
         $output->writeln('<info>Create host ('.$this->domain.')...</info>');
         $this->updateHostsFile();
 
-        $output->writeln('<info>Update Vagrant site mapper (/'.$this->folder.')</info>');
+        $output->writeln('<info>Update Vagrant site mapper ('.$this->folder.')</info>');
         $this->updateHomesteadSites();
 
         $output->writeln('<info>Update Vagrant database ('.$this->database.')</info>');
@@ -110,7 +116,7 @@ class Host extends Command
     }
 
     private function getFolderFromQuestion(){
-        $question = new Question("What is your project's folder? ($this->folder): ", $this->folder);
+        $question = new Question("What local directory will store your project? ($this->folder): ", $this->folder);
         return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
     }
 
@@ -148,6 +154,7 @@ class Host extends Command
 
     private function createProject()
     {
+        $this->outputInterface->writeln("cd {$this->folder} && composer create-project {$this->composerProject} {$this->name}");
         $shellOutput = shell_exec("cd {$this->folder} && composer create-project {$this->composerProject} {$this->name}");
     }
 
@@ -177,7 +184,7 @@ class Host extends Command
     }
 
     private function provisionHomestead(){
-        if(!is_null($this->homesteadProvisionCommand)){
+        if(!empty($this->homesteadProvisionCommand)){
             $shellOutput = shell_exec($this->homesteadProvisionCommand);
         }else{
             $shellOutput = shell_exec('cd '.$this->homesteadBoxPath.' && vagrant provision');
