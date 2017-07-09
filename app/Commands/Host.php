@@ -4,11 +4,10 @@ namespace App\Commands;
 
 use App\FileManagers\HomesteadFileManager;
 use App\FileManagers\HostsFileManager;
+use App\Input\Interrogator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Console\Question\Question;
 
 class Host extends Command
 {
@@ -32,6 +31,8 @@ class Host extends Command
     private $homesteadBoxPath;
     private $homesteadProvisionCommand;
 
+    private $interrogator;
+
     protected function configure()
     {
         $this
@@ -45,6 +46,7 @@ class Host extends Command
         $this->outputInterface = $output;
         $this->updateFromConfig();
         $this->questionHelper = $this->getHelper('question');
+        $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
     }
 
     private function updateFromConfig(){
@@ -65,22 +67,40 @@ class Host extends Command
     {
         $this->init($input, $output);
 
-        $this->name = $this->getNameFromQuestion();
+        $this->name = $this->interrogator->ask(
+            'What is your project\'s name?',
+            'project-' . time()
+        );
 
         if($this->useComposer){
-            $this->composerProject = $this->getComposerProjectFromQuestion();
+            $this->composerProject = $this->interrogator->ask(
+                'What composer project?',
+                $this->composerProject
+            );
         }
 
-        $this->folder = $this->getFolderFromQuestion();
+        $this->folder = $this->interrogator->ask(
+            'What local directory will store your project?',
+            $this->folder
+        );
 
         if($this->composerProject != 'laravel/laravel')
         {
-            $this->folderSuffix = $this->getFolderSuffixFromQuestion();
+            $this->folderSuffix = $this->interrogator->ask(
+                'Point site to?',
+                $this->folderSuffix
+            );
         }
 
-        $this->database = $this->getDatabaseFromQuestion();
+        $this->database = $this->interrogator->ask(
+            'Database Name?',
+            $this->defaultDatabaseNameFromKey($this->name)
+        );
 
-        $this->domain = $this->getDomainFromQuestion();
+        $this->domain = $this->interrogator->ask(
+            'Development Domain?',
+            $this->defaultDomainNameFromKey($this->database)
+        );
 
         $taskConfirmation = $this->getTaskConfirmationFromQuestion();
 
@@ -115,38 +135,6 @@ class Host extends Command
 
     }
 
-    private function getNameFromQuestion(){
-        $question = new Question('What is your project\'s name? ', 'project-' . time());
-        return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
-    }
-
-    private function getComposerProjectFromQuestion(){
-        $question = new Question("What composer project? ({$this->composerProject}): ", $this->composerProject);
-        return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
-    }
-
-    private function getFolderFromQuestion(){
-        $question = new Question("What local directory will store your project? ($this->folder): ", $this->folder);
-        return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
-    }
-
-    private function getFolderSuffixFromQuestion(){        
-        $question = new Question("Point site to? ({$this->folderSuffix}): ", $this->folderSuffix);
-        return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
-    }
-
-    private function getDatabaseFromQuestion(){
-        $default = $this->defaultDatabaseNameFromKey($this->name);
-        $question = new Question('Database Name? ('.$default.'): ', $default);
-        return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
-    }
-
-    private function getDomainFromQuestion(){
-        $default = $this->defaultDomainNameFromKey($this->database);
-        $question = new Question('Development Domain? ('.$default.'): ', $default);
-        return $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
-    }
-
     private function getTaskConfirmationFromQuestion(){
         $this->outputInterface->writeln('<info>The following tasks will be executed:</info>');
         if($this->useComposer && !empty($this->composerProject)){
@@ -161,8 +149,11 @@ class Host extends Command
             $this->outputInterface->writeln('- Run Command: cd '.$this->homesteadBoxPath.' && vagrant provision');
         }
         $default = 'Y';
-        $question = new Question('Run tasks? ('.$default.'): ', $default);
-        $response = $this->questionHelper->ask($this->inputInterface, $this->outputInterface, $question);
+
+        $response = $this->interrogator->ask(
+            'Run tasks?',
+            'Y'
+        );
         if(strtoupper($response) == 'Y'){
             return true;
         }
