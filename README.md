@@ -77,6 +77,14 @@ Some options available:
 
 The following example will run all tasks automatically without any question prompts:
 
-```$xslt
+```
 homeboy host --name=my-project --use-defaults --skip-confirmation
+```
+
+### Vagrant
+
+Homeboy also contains the "vagrant" command, allowing you to quickly run any vagrant command without having to cd into that directory, ie:
+
+```
+homeboy vagrant status
 ```
