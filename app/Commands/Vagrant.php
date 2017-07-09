@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\Configuration\Config;
 use App\Support\Vagrant\Vagrant as VagrantSupport;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,11 +15,10 @@ class Vagrant extends Command
     private $inputInterface;
     private $outputInterface;
 
-    private $homesteadBoxPath;
-    private $homesteadAccessDirectoryCommand;
     private $action;
 
     private $vagrant;
+    private $config;
 
     protected function configure()
     {
@@ -32,10 +32,10 @@ class Vagrant extends Command
     private function init(InputInterface $input, OutputInterface $output){
         $this->inputInterface = $input;
         $this->outputInterface = $output;
-        $this->updateFromConfig();
-        $vagrantAccessDirectoryCommand = 'cd '.$this->homesteadBoxPath;
-        if(!empty($this->homesteadAccessDirectoryCommand)){
-            $vagrantAccessDirectoryCommand = $this->homesteadAccessDirectoryCommand;
+        $this->config = new Config();
+        $vagrantAccessDirectoryCommand = 'cd '.$this->config->getHomesteadBoxPath();
+        if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
+            $vagrantAccessDirectoryCommand = $this->config->getHomesteadAccessDirectoryCommand();
         }
         $this->vagrant = new VagrantSupport($vagrantAccessDirectoryCommand);
     }
@@ -46,11 +46,6 @@ class Vagrant extends Command
             InputArgument::REQUIRED,
             'Vagrant command to run'
         );
-    }
-
-    private function updateFromConfig(){
-        $this->homesteadBoxPath = getenv('HOMESTEAD_BOX_PATH');
-        $this->homesteadAccessDirectoryCommand = getenv('HOMESTEAD_ACCESS_DIRECTORY_COMMAND');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

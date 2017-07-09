@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\Configuration\Config;
 use App\FileManagers\HomesteadFileManager;
 use App\FileManagers\HostsFileManager;
 use App\Input\Interrogator;
@@ -18,20 +19,14 @@ class Host extends Command
     private $inputInterface;
     private $outputInterface;
 
+    private $config;
+
     private $name;
     private $composerProject;
-    private $useComposer;
     private $folder;
     private $folderSuffix;
     private $database;
     private $domain;
-    private $domainExtension;
-    private $hostIP;
-    private $hostPath;
-    private $homesteadPath;
-    private $homesteadSitesPath;
-    private $homesteadBoxPath;
-    private $homesteadAccessDirectoryCommand;
     private $useDefaults=false;
     private $skipConfirmation=false;
 
@@ -53,10 +48,10 @@ class Host extends Command
         $this->outputInterface = $output;
         $this->questionHelper = $this->getHelper('question');
         $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
-        $this->updateFromConfig();
-        $vagrantAccessDirectoryCommand = 'cd '.$this->homesteadBoxPath;
-        if(!empty($this->homesteadAccessDirectoryCommand)){
-            $vagrantAccessDirectoryCommand = $this->homesteadAccessDirectoryCommand;
+        $this->config = new Config();
+        $vagrantAccessDirectoryCommand = 'cd '.$this->config->getHomesteadBoxPath();
+        if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
+            $vagrantAccessDirectoryCommand = $this->config->getHomesteadAccessDirectoryCommand();
         }
         $this->vagrant = new Vagrant($vagrantAccessDirectoryCommand);
     }
@@ -95,20 +90,6 @@ class Host extends Command
             'Development Domain',
             null
         );
-    }
-
-    private function updateFromConfig(){
-        $this->folder = getenv('LOCAL_SITES_PATH');
-        $this->folderSuffix = getenv('DEFAULT_FOLDER_SUFFIX');
-        $this->useComposer = boolval(getenv('USE_COMPOSER'));
-        $this->composerProject = getenv('DEFAULT_COMPOSER_PROJECT');
-        $this->hostPath = getenv('HOSTS_FILE_PATH');
-        $this->hostIP = getenv('HOMESTEAD_HOST_IP');
-        $this->homesteadPath = getenv('HOMESTEAD_FILE_PATH');
-        $this->homesteadSitesPath = getenv('HOMESTEAD_SITES_PATH');
-        $this->homesteadBoxPath = getenv('HOMESTEAD_BOX_PATH');
-        $this->homesteadAccessDirectoryCommand = getenv('HOMESTEAD_ACCESS_DIRECTORY_COMMAND');
-        $this->domainExtension = getenv('DEFAULT_DOMAIN_EXTENSION');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -165,22 +146,22 @@ class Host extends Command
                 );
             }
 
-            if ($this->useComposer) {
+            if ($this->config->getUseComposer()) {
                 $this->composerProject = $this->interrogator->ask(
                     'What composer project?',
-                    $this->composerProject
+                    $this->config->getComposerProject()
                 );
             }
 
             $this->folder = $this->interrogator->ask(
                 'What local directory will store your project?',
-                $this->folder
+                $this->config->getFolder()
             );
 
             if ($this->composerProject != 'laravel/laravel') {
                 $this->folderSuffix = $this->interrogator->ask(
                     'Point site to?',
-                    $this->folderSuffix
+                    $this->config->getFolderSuffix()
                 );
             }
 
@@ -205,18 +186,17 @@ class Host extends Command
 
     private function getTaskConfirmationFromQuestion(){
         $this->outputInterface->writeln('<info>The following tasks will be executed:</info>');
-        if($this->useComposer && !empty($this->composerProject)){
+        if($this->config->getUseComposer() && !empty($this->composerProject)){
             $this->outputInterface->writeln("- Run Command: cd {$this->folder} && composer create-project {$this->composerProject} {$this->name}");
         }
-        $this->outputInterface->writeln('- ('.$this->hostPath.') add line: '.$this->hostIP.' '.$this->domain);
-        $this->outputInterface->writeln('- ('.$this->homesteadPath.') map : '.$this->domain.' to '.$this->homesteadSitesPath.$this->name.$this->folderSuffix);
-        $this->outputInterface->writeln('- ('.$this->homesteadPath.') add to databases: '.$this->database);
+        $this->outputInterface->writeln('- ('.$this->config->getHostsPath().') add line: '.$this->config->getHostIP().' '.$this->domain);
+        $this->outputInterface->writeln('- ('.$this->config->getHomesteadPath().') map : '.$this->domain.' to '.$this->config->getHomesteadSitesPath().$this->name.$this->folderSuffix);
+        $this->outputInterface->writeln('- ('.$this->config->getHomesteadPath().') add to databases: '.$this->database);
         if(!empty($this->homesteadProvisionCommand)){
             $this->outputInterface->writeln('- Run Command: '.$this->homesteadProvisionCommand);
         }else{
-            $this->outputInterface->writeln('- Run Command: cd '.$this->homesteadBoxPath.' && vagrant provision');
+            $this->outputInterface->writeln('- Run Command: cd '.$this->config->getHomesteadBoxPath().' && vagrant provision');
         }
-        $default = 'Y';
 
         $response = $this->interrogator->ask(
             'Run tasks?',
@@ -229,7 +209,7 @@ class Host extends Command
     }
 
     private function runTasks(){
-        if($this->useComposer && !empty($this->composerProject)){
+        if($this->config->getUseComposer() && !empty($this->composerProject)){
             $this->outputInterface->writeln('<info>Creating project...</info>');
             $this->createProject();
         }
@@ -237,10 +217,10 @@ class Host extends Command
         $this->outputInterface->writeln('<info>Adding Domain to hosts file ('.$this->domain.')...</info>');
         $this->updateHostsFile();
 
-        $this->outputInterface->writeln('<info>Mapping '.$this->domain.' in "'.$this->homesteadPath.'"...</info>');
+        $this->outputInterface->writeln('<info>Mapping '.$this->domain.' in "'.$this->config->getHomesteadPath().'"...</info>');
         $this->updateHomesteadSites();
 
-        $this->outputInterface->writeln('<info>Adding database ('.$this->database.') to "'.$this->homesteadPath.'"...</info>');
+        $this->outputInterface->writeln('<info>Adding database ('.$this->database.') to "'.$this->config->getHomesteadPath().'"...</info>');
         $this->updateHomesteadDatabases();
 
         $this->outputInterface->writeln('<info>Provisioning Vagrant...</info>');
@@ -260,7 +240,7 @@ class Host extends Command
     private function defaultDomainNameFromKey($key){
         $key = strtolower($key);
         $key = preg_replace("/[^A-Za-z0-9]/", '', $key);
-        $key = $key.$this->domainExtension;
+        $key = $key.$this->config->getDomainExtension();
         return $key;
     }
 
@@ -270,17 +250,17 @@ class Host extends Command
     }
 
     private function updateHostsFile(){
-        $fileManager = new HostsFileManager($this->hostPath);
-        $fileManager->appendLine($this->hostIP.' '.$this->domain);
+        $fileManager = new HostsFileManager($this->config->getHostsPath());
+        $fileManager->appendLine($this->config->getHostIP().' '.$this->domain);
     }
 
     private function updateHomesteadSites(){
-        $fileManager = new HomesteadFileManager($this->homesteadPath);
-        $fileManager->addMapLineToSites($this->domain, $this->homesteadSitesPath.$this->name.$this->folderSuffix);
+        $fileManager = new HomesteadFileManager($this->config->getHomesteadPath());
+        $fileManager->addMapLineToSites($this->domain, $this->config->getHomesteadSitesPath().$this->name.$this->folderSuffix);
     }
 
     private function updateHomesteadDatabases(){
-        $fileManager = new HomesteadFileManager($this->homesteadPath);
+        $fileManager = new HomesteadFileManager($this->config->getHomesteadPath());
         $fileManager->addDatabase($this->database);
     }
 

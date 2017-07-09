@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\Configuration\Config;
 use App\FileManagers\HomesteadFileManager;
 use App\FileManagers\HostsFileManager;
 use App\Support\Vagrant\Vagrant as VagrantSupport;
@@ -15,13 +16,8 @@ class File extends Command
 
     private $inputInterface;
     private $outputInterface;
-
-    private $hostPath;
-    private $homesteadPath;
-    private $homesteadBoxPath;
-    private $homesteadAccessDirectoryCommand;
     private $file;
-
+    private $config;
     private $vagrant;
 
     protected function configure()
@@ -36,10 +32,10 @@ class File extends Command
     private function init(InputInterface $input, OutputInterface $output){
         $this->inputInterface = $input;
         $this->outputInterface = $output;
-        $this->updateFromConfig();
-        $vagrantAccessDirectoryCommand = 'cd '.$this->homesteadBoxPath;
-        if(!empty($this->homesteadAccessDirectoryCommand)){
-            $vagrantAccessDirectoryCommand = $this->homesteadAccessDirectoryCommand;
+        $this->config = new Config();
+        $vagrantAccessDirectoryCommand = 'cd '.$this->config->getHomesteadBoxPath();
+        if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
+            $vagrantAccessDirectoryCommand = $this->config->getHomesteadAccessDirectoryCommand();
         }
         $this->vagrant = new VagrantSupport($vagrantAccessDirectoryCommand);
     }
@@ -52,23 +48,16 @@ class File extends Command
         );
     }
 
-    private function updateFromConfig(){
-        $this->homesteadBoxPath = getenv('HOMESTEAD_BOX_PATH');
-        $this->homesteadAccessDirectoryCommand = getenv('HOMESTEAD_ACCESS_DIRECTORY_COMMAND');
-        $this->hostPath = getenv('HOSTS_FILE_PATH');
-        $this->homesteadPath = getenv('HOMESTEAD_FILE_PATH');
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->init($input, $output);
         $this->updateFromOptions();
         if($this->file == 'hosts'){
-            $fileManager = new HostsFileManager($this->hostPath);
+            $fileManager = new HostsFileManager($this->config->getHostsPath());
             $this->outputInterface->writeLn($fileManager->getFileContents());
         }
         if($this->file == 'homestead'){
-            $fileManager = new HomesteadFileManager($this->homesteadPath);
+            $fileManager = new HomesteadFileManager($this->config->getHomesteadPath());
             $this->outputInterface->writeLn($fileManager->getFileContents());
         }
         return;
@@ -76,18 +65,6 @@ class File extends Command
 
     private function updateFromOptions(){
         $this->file = $this->inputInterface->getArgument('file');
-
-        $this->folder = getenv('LOCAL_SITES_PATH');
-        $this->folderSuffix = getenv('DEFAULT_FOLDER_SUFFIX');
-        $this->useComposer = boolval(getenv('USE_COMPOSER'));
-        $this->composerProject = getenv('DEFAULT_COMPOSER_PROJECT');
-        $this->hostPath = getenv('HOSTS_FILE_PATH');
-        $this->hostIP = getenv('HOMESTEAD_HOST_IP');
-        $this->homesteadPath = getenv('HOMESTEAD_FILE_PATH');
-        $this->homesteadSitesPath = getenv('HOMESTEAD_SITES_PATH');
-        $this->homesteadBoxPath = getenv('HOMESTEAD_BOX_PATH');
-        $this->homesteadAccessDirectoryCommand = getenv('HOMESTEAD_ACCESS_DIRECTORY_COMMAND');
-        $this->domainExtension = getenv('DEFAULT_DOMAIN_EXTENSION');
     }
 
 }
