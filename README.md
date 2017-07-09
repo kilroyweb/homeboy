@@ -61,6 +61,8 @@ Running this command automates the task of creating a new composer project, upda
 
 When the command runs, it prompts for the sites directory name, database name, and dev url to update the needed files and then provisions vagrant
 
+Note: To enable composer project creation, be sure to add "USE_COMPOSER=true" to your .env file
+
 ### Options
 
 A few options have been added to speed up the command. However because the command "homeboy" is simply a shortcut for "homeboy host" (allowing us to add additional commands in the future), options only work when calling "homeboy host" rather than just "homeboy".
