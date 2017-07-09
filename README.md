@@ -2,6 +2,7 @@
 
 Tool for automating sites using Laravel Homestead. With one command, Homeboy will:
 
+- Install Laravel into a new directory via composer
 - Update your host file to point your dev domain to your homestead IP
 - Update your Homestead.yaml file mapping to include your new project
 - Update your Homestead.yaml file to create a database for your project
@@ -56,9 +57,7 @@ homeboy=php C:\Users\[USER]\homeboy\homeboy $*
 homeboy
 ```
 
-*As of 1.0.1, homeboy will use composer to install laravel to a new directory as well*
-
-Running this command automates the task of updating your hosts file and vagrant files when provisioning a new website
+Running this command automates the task of creating a new composer project, updating your hosts file and vagrant files when provisioning a new website
 
 When the command runs, it prompts for the sites directory name, database name, and dev url to update the needed files and then provisions vagrant
 
