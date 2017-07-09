@@ -61,3 +61,21 @@ homeboy
 Running this command automates the task of updating your hosts file and vagrant files when provisioning a new website
 
 When the command runs, it prompts for the sites directory name, database name, and dev url to update the needed files and then provisions vagrant
+
+### Options
+
+A few options have been added to speed up the command. However because the command "homeboy" is simply a shortcut for "homeboy host" (allowing us to add additional commands in the future), options only work when calling "homeboy host" rather than just "homeboy".
+
+Some options available:
+
+- ```--use-defaults``` : Automatically accept defaults before provisioning
+- ```--skip-confirmation``` : Automatically confirm before running task
+- ```--name``` : Directory name to create project in
+- ```--database``` : Database to add to homestead
+- ```--domain``` : Development domain
+
+The following example will run all tasks automatically without any question prompts:
+
+```$xslt
+homeboy host --name=my-project --use-defaults --skip-confirmation
+```
