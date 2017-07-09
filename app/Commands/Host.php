@@ -182,7 +182,6 @@ class Host extends Command
 
     private function createProject()
     {
-        $this->outputInterface->writeln("cd {$this->folder} && composer create-project {$this->composerProject} {$this->name}");
         $shellOutput = shell_exec("cd {$this->folder} && composer create-project {$this->composerProject} {$this->name}");
     }
 
