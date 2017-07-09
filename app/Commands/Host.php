@@ -3,6 +3,7 @@
 namespace App\Commands;
 
 use App\FileManagers\HomesteadFileManager;
+use App\FileManagers\HostsFileManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -190,8 +191,8 @@ class Host extends Command
     }
 
     private function updateHostsFile(){
-        $hostAppendLine = $this->hostIP.' '.$this->domain;
-        file_put_contents($this->hostPath, PHP_EOL.$hostAppendLine, FILE_APPEND | LOCK_EX);
+        $fileManager = new HostsFileManager($this->hostPath);
+        $fileManager->appendLine($this->hostIP.' '.$this->domain);
     }
 
     private function updateHomesteadSites(){

@@ -39,4 +39,15 @@ abstract class BaseFileManager{
         }
     }
 
+    public function appendLine($line){
+        if($this->allowWriteFile){
+            return file_put_contents($this->filePath, PHP_EOL.$line, FILE_APPEND | LOCK_EX);
+        }else{
+            $contents = $this->getFileContents();
+            $contents .= PHP_EOL.$line;
+            return $contents;
+        }
+
+    }
+
 }
