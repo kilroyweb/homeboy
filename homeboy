@@ -11,8 +11,10 @@ $dotenv->load();
 $application = new Application();
 
 $hostCommand = new \App\Commands\Host();
+$vagrantCommand = new \App\Commands\Vagrant();
 
 $application->add($hostCommand);
+$application->add($vagrantCommand);
 
 $application->setDefaultCommand($hostCommand->getName());
 
