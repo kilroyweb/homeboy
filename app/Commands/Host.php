@@ -7,6 +7,7 @@ use App\FileManagers\HostsFileManager;
 use App\Input\Interrogator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Host extends Command
@@ -30,6 +31,7 @@ class Host extends Command
     private $homesteadSitesPath;
     private $homesteadBoxPath;
     private $homesteadProvisionCommand;
+    private $useDefaults=false;
 
     private $interrogator;
 
@@ -38,7 +40,8 @@ class Host extends Command
         $this
             ->setName('host')
             ->setDescription('Host a new site')
-            ->setHelp("");
+            ->setHelp("")
+            ->addCommandOptions();
     }
 
     private function init(InputInterface $input, OutputInterface $output){
@@ -47,6 +50,37 @@ class Host extends Command
         $this->questionHelper = $this->getHelper('question');
         $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
         $this->updateFromConfig();
+    }
+
+    private function addCommandOptions(){
+        $this->addOption(
+            'use-defaults',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Ignore questions and use defaults',
+            false
+        );
+        $this->addOption(
+            'name',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Project Name',
+            null
+        );
+        $this->addOption(
+            'database',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Database',
+            null
+        );
+        $this->addOption(
+            'domain',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Development Domain',
+            null
+        );
     }
 
     private function updateFromConfig(){
@@ -66,14 +100,12 @@ class Host extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->init($input, $output);
+        $this->updateFromOptions();
         $this->interrogate();
 
         $taskConfirmation = $this->getTaskConfirmationFromQuestion();
-
         if($taskConfirmation){
-
             $this->runTasks();
-
         }else{
             $output->writeln('<error>Tasks cancelled</error>');
         }
@@ -82,41 +114,71 @@ class Host extends Command
 
     }
 
+    private function updateFromOptions(){
+        if($this->inputInterface->getOption('use-defaults')){
+            $this->useDefaults = boolval($this->inputInterface->getOption('use-defaults'));
+        }
+        if($this->inputInterface->getOption('name')){
+            $this->name = $this->inputInterface->getOption('name');
+        }
+        if($this->inputInterface->getOption('database')){
+            $this->database = $this->inputInterface->getOption('database');
+        }else{
+            $this->database = $this->defaultDatabaseNameFromKey($this->name);
+        }
+        if($this->inputInterface->getOption('domain')){
+            $this->domain = $this->inputInterface->getOption('domain');
+        }else{
+            $this->domain = $this->defaultDomainNameFromKey($this->name);
+        }
+    }
+
     private function interrogate(){
-        $this->name = $this->interrogator->ask(
-            'What is your project\'s name?',
-            'project-' . time()
-        );
+        if(!$this->useDefaults) {
 
-        if($this->useComposer){
-            $this->composerProject = $this->interrogator->ask(
-                'What composer project?',
-                $this->composerProject
+            if(is_null($this->name)){
+                $this->name = $this->interrogator->ask(
+                    'What is your project\'s name?',
+                    'project-' . time()
+                );
+            }
+
+            if ($this->useComposer) {
+                $this->composerProject = $this->interrogator->ask(
+                    'What composer project?',
+                    $this->composerProject
+                );
+            }
+
+            $this->folder = $this->interrogator->ask(
+                'What local directory will store your project?',
+                $this->folder
             );
+
+            if ($this->composerProject != 'laravel/laravel') {
+                $this->folderSuffix = $this->interrogator->ask(
+                    'Point site to?',
+                    $this->folderSuffix
+                );
+            }
+
+            if(!$this->inputInterface->getOption('database')) {
+                $this->database = $this->defaultDatabaseNameFromKey($this->name);
+                $this->database = $this->interrogator->ask(
+                    'Database Name?',
+                    $this->database
+                );
+            }
+
+            if(!$this->inputInterface->getOption('domain')) {
+                $this->domain = $this->defaultDomainNameFromKey($this->name);
+                $this->domain = $this->interrogator->ask(
+                    'Development Domain?',
+                    $this->domain
+                );
+            }
+
         }
-
-        $this->folder = $this->interrogator->ask(
-            'What local directory will store your project?',
-            $this->folder
-        );
-
-        if($this->composerProject != 'laravel/laravel')
-        {
-            $this->folderSuffix = $this->interrogator->ask(
-                'Point site to?',
-                $this->folderSuffix
-            );
-        }
-
-        $this->database = $this->interrogator->ask(
-            'Database Name?',
-            $this->defaultDatabaseNameFromKey($this->name)
-        );
-
-        $this->domain = $this->interrogator->ask(
-            'Development Domain?',
-            $this->defaultDomainNameFromKey($this->database)
-        );
     }
 
     private function getTaskConfirmationFromQuestion(){
