@@ -5,6 +5,7 @@ namespace App\Commands;
 use App\FileManagers\HomesteadFileManager;
 use App\FileManagers\HostsFileManager;
 use App\Input\Interrogator;
+use App\Support\Vagrant\Vagrant;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -30,11 +31,13 @@ class Host extends Command
     private $homesteadPath;
     private $homesteadSitesPath;
     private $homesteadBoxPath;
-    private $homesteadProvisionCommand;
+    private $homesteadAccessDirectoryCommand;
     private $useDefaults=false;
     private $skipConfirmation=false;
 
     private $interrogator;
+
+    private $vagrant;
 
     protected function configure()
     {
@@ -51,6 +54,11 @@ class Host extends Command
         $this->questionHelper = $this->getHelper('question');
         $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
         $this->updateFromConfig();
+        $vagrantAccessDirectoryCommand = 'cd '.$this->homesteadBoxPath;
+        if(!empty($this->homesteadAccessDirectoryCommand)){
+            $vagrantAccessDirectoryCommand = $this->homesteadAccessDirectoryCommand;
+        }
+        $this->vagrant = new Vagrant($vagrantAccessDirectoryCommand);
     }
 
     private function addCommandOptions(){
@@ -99,7 +107,7 @@ class Host extends Command
         $this->homesteadPath = getenv('HOMESTEAD_FILE_PATH');
         $this->homesteadSitesPath = getenv('HOMESTEAD_SITES_PATH');
         $this->homesteadBoxPath = getenv('HOMESTEAD_BOX_PATH');
-        $this->homesteadProvisionCommand = getenv('HOMESTEAD_PROVISION_COMMAND');
+        $this->homesteadAccessDirectoryCommand = getenv('HOMESTEAD_ACCESS_DIRECTORY_COMMAND');
         $this->domainExtension = getenv('DEFAULT_DOMAIN_EXTENSION');
     }
 
@@ -277,11 +285,7 @@ class Host extends Command
     }
 
     private function provisionHomestead(){
-        if(!empty($this->homesteadProvisionCommand)){
-            $shellOutput = shell_exec($this->homesteadProvisionCommand);
-        }else{
-            $shellOutput = shell_exec('cd '.$this->homesteadBoxPath.' && vagrant provision');
-        }
+        $this->vagrant->provision();
     }
 
 
