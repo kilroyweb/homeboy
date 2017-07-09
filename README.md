@@ -88,3 +88,16 @@ Homeboy also contains the "vagrant" command, allowing you to quickly run any vag
 ```
 homeboy vagrant status
 ```
+
+### Viewing Files
+
+Quickly view a file contents by running:
+
+```
+homeboy file hosts
+```
+or
+
+```
+homeboy file homestead
+```

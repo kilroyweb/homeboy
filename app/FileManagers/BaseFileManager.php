@@ -27,7 +27,7 @@ abstract class BaseFileManager{
         $this->allowWriteFile = $allowWriteFile;
     }
 
-    protected function getFileContents(){
+    public function getFileContents(){
         return file_get_contents($this->filePath);
     }
 

@@ -12,9 +12,11 @@ $application = new Application();
 
 $hostCommand = new \App\Commands\Host();
 $vagrantCommand = new \App\Commands\Vagrant();
+$fileCommand = new \App\Commands\File();
 
 $application->add($hostCommand);
 $application->add($vagrantCommand);
+$application->add($fileCommand);
 
 $application->setDefaultCommand($hostCommand->getName());
 
