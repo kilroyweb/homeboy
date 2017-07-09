@@ -16,6 +16,11 @@
             "App\\": "app/"
         }
     },
+    "autoload-dev": {
+        "classmap": [
+            "tests/AppTestCase.php"
+        ]
+    },
     "require-dev": {
         "phpunit/phpunit": "^6.1"
     }

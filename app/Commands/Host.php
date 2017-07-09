@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\FileManagers\HomesteadFileManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -194,23 +195,13 @@ class Host extends Command
     }
 
     private function updateHomesteadSites(){
-        $homesteadContents = file_get_contents($this->homesteadPath);
-        $tabSpacing = "    ";
-        $mapLine = $tabSpacing."- map: ".$this->domain;
-        $toLine = $tabSpacing."  to: ".$this->homesteadSitesPath.$this->name.$this->folderSuffix;
-        $newLines = $mapLine.PHP_EOL.$toLine;
-        $search = "sites:";
-        $homesteadContents = str_replace($search,$search.PHP_EOL.$newLines,$homesteadContents);
-        file_put_contents($this->homesteadPath, $homesteadContents);
+        $fileManager = new HomesteadFileManager($this->homesteadPath);
+        $fileManager->addMapLineToSites($this->domain, $this->homesteadSitesPath.$this->name.$this->folderSuffix);
     }
 
     private function updateHomesteadDatabases(){
-        $homesteadContents = file_get_contents($this->homesteadPath);
-        $tabSpacing = "    ";
-        $line = $tabSpacing."- ".$this->database;
-        $search = "databases:";
-        $homesteadContents = str_replace($search,$search.PHP_EOL.$line,$homesteadContents);
-        file_put_contents($this->homesteadPath, $homesteadContents);
+        $fileManager = new HomesteadFileManager($this->homesteadPath);
+        $fileManager->addDatabase($this->database);
     }
 
     private function provisionHomestead(){
