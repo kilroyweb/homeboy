@@ -32,6 +32,7 @@ class Host extends Command
     private $homesteadBoxPath;
     private $homesteadProvisionCommand;
     private $useDefaults=false;
+    private $skipConfirmation=false;
 
     private $interrogator;
 
@@ -56,9 +57,14 @@ class Host extends Command
         $this->addOption(
             'use-defaults',
             null,
-            InputOption::VALUE_REQUIRED,
-            'Ignore questions and use defaults',
-            false
+            InputOption::VALUE_NONE,
+            'Ignore questions and use defaults'
+        );
+        $this->addOption(
+            'skip-confirmation',
+            null,
+            InputOption::VALUE_NONE,
+            'Skip Confirmation'
         );
         $this->addOption(
             'name',
@@ -103,7 +109,12 @@ class Host extends Command
         $this->updateFromOptions();
         $this->interrogate();
 
-        $taskConfirmation = $this->getTaskConfirmationFromQuestion();
+        if($this->skipConfirmation){
+            $taskConfirmation = true;
+        }else{
+            $taskConfirmation = $this->getTaskConfirmationFromQuestion();
+        }
+
         if($taskConfirmation){
             $this->runTasks();
         }else{
@@ -117,6 +128,9 @@ class Host extends Command
     private function updateFromOptions(){
         if($this->inputInterface->getOption('use-defaults')){
             $this->useDefaults = boolval($this->inputInterface->getOption('use-defaults'));
+        }
+        if($this->inputInterface->getOption('skip-confirmation')){
+            $this->skipConfirmation = boolval($this->inputInterface->getOption('skip-confirmation'));
         }
         if($this->inputInterface->getOption('name')){
             $this->name = $this->inputInterface->getOption('name');
