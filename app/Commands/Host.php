@@ -44,9 +44,9 @@ class Host extends Command
     private function init(InputInterface $input, OutputInterface $output){
         $this->inputInterface = $input;
         $this->outputInterface = $output;
-        $this->updateFromConfig();
         $this->questionHelper = $this->getHelper('question');
         $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
+        $this->updateFromConfig();
     }
 
     private function updateFromConfig(){
@@ -66,7 +66,23 @@ class Host extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->init($input, $output);
+        $this->interrogate();
 
+        $taskConfirmation = $this->getTaskConfirmationFromQuestion();
+
+        if($taskConfirmation){
+
+            $this->runTasks();
+
+        }else{
+            $output->writeln('<error>Tasks cancelled</error>');
+        }
+
+        return;
+
+    }
+
+    private function interrogate(){
         $this->name = $this->interrogator->ask(
             'What is your project\'s name?',
             'project-' . time()
@@ -101,38 +117,6 @@ class Host extends Command
             'Development Domain?',
             $this->defaultDomainNameFromKey($this->database)
         );
-
-        $taskConfirmation = $this->getTaskConfirmationFromQuestion();
-
-        if($taskConfirmation){
-
-            if($this->useComposer && !empty($this->composerProject)){
-                $output->writeln('<info>Creating project..</info>');
-                $this->createProject();
-            }
-
-            $output->writeln('<info>Create host ('.$this->domain.')...</info>');
-            $this->updateHostsFile();
-
-            $output->writeln('<info>Update Vagrant site mapper ('.$this->folder.')</info>');
-            $this->updateHomesteadSites();
-
-            $output->writeln('<info>Update Vagrant database ('.$this->database.')</info>');
-            $this->updateHomesteadDatabases();
-
-            $output->writeln('<info>Provision Vagrant</info>');
-            $this->provisionHomestead();
-
-            $output->writeln('<success>Complete!</success>');
-
-            $output->writeln('Visit: http://' . $this->domain);
-
-        }else{
-            $output->writeln('<error>Tasks cancelled</error>');
-        }
-
-        return;
-
     }
 
     private function getTaskConfirmationFromQuestion(){
@@ -158,6 +142,27 @@ class Host extends Command
             return true;
         }
         return false;
+    }
+
+    private function runTasks(){
+        if($this->useComposer && !empty($this->composerProject)){
+            $this->outputInterface->writeln('<info>Creating project...</info>');
+            $this->createProject();
+        }
+
+        $this->outputInterface->writeln('<info>Adding Domain to hosts file ('.$this->domain.')...</info>');
+        $this->updateHostsFile();
+
+        $this->outputInterface->writeln('<info>Mapping '.$this->domain.' in "'.$this->homesteadPath.'"...</info>');
+        $this->updateHomesteadSites();
+
+        $this->outputInterface->writeln('<info>Adding database ('.$this->database.') to "'.$this->homesteadPath.'"...</info>');
+        $this->updateHomesteadDatabases();
+
+        $this->outputInterface->writeln('<info>Provisioning Vagrant...</info>');
+        $this->provisionHomestead();
+
+        $this->outputInterface->writeln('<success>Complete! Visit: http://'.$this->domain.'</success>');
     }
 
     private function defaultDatabaseNameFromKey($key){
