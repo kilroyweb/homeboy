@@ -129,6 +129,8 @@ class Setup extends Command
     private function defaultBaseUserDirectory(){
         if($this->installType == 'Windows'){
             return 'C:\\Users\\'.$this->systemUserName;
+        }elseif($this->installType == 'Linux'){
+            return '/home/'.$this->systemUserName;
         }else{
             return '/Users/'.$this->systemUserName;
         }
