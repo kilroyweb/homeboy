@@ -27,7 +27,11 @@ cd homeboy
 composer install
 ```
 
-- Copy one of the .env.example files to a new file called `.env` and update it with your information
+Run the setup command to generate a .env file
+
+```
+php homeboy setup
+```
 
 **By this point, you should be able to run homeboy within the directory using the command:**
 
@@ -60,8 +64,6 @@ homeboy
 Running this command automates the task of creating a new composer project, updating your hosts file and vagrant files when provisioning a new website
 
 When the command runs, it prompts for the sites directory name, database name, and dev url to update the needed files and then provisions vagrant
-
-Note: To enable composer project creation, be sure to add "USE_COMPOSER=true" to your .env file
 
 ### Options
 
