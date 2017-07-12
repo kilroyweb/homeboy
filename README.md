@@ -55,6 +55,21 @@ homeboy=php C:\Users\[USER]\homeboy\homeboy $*
 
 *be sure to edit the path based on where homeboy is installed*
 
+
+### Using Composer
+
+Install Homeboy using Composer:
+
+```
+composer global require "kilroyweb/homeboy"
+```
+
+Make sure to place the $HOME/.composer/vendor/bin directory (or the equivalent directory for your OS) 
+in your $PATH so the laravel executable can be located by your system.
+
+Once installed, you can use ``homeboy`` command from anywhere on your system.
+
+
 ### Use Homeboy to host a new homestead site
 
 ```
