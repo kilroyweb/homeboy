@@ -167,6 +167,8 @@ class Host extends Command
                     'Point site to?',
                     $this->config->getFolderSuffix()
                 );
+            }else{
+                $this->folderSuffix = $this->config->getFolderSuffix();
             }
 
             if(!$this->inputInterface->getOption('database')) {
@@ -250,7 +252,11 @@ class Host extends Command
 
     private function createProject()
     {
-        $shellOutput = shell_exec("cd {$this->folder} && composer create-project {$this->composerProject} {$this->name}");
+        if(!empty($this->config->getAccessLocalSitesDirectoryCommand())){
+            $shellOutput = shell_exec($this->config->getAccessLocalSitesDirectoryCommand()." && composer create-project {$this->composerProject} {$this->name}");
+        }else{
+            $shellOutput = shell_exec("cd {$this->folder} && composer create-project {$this->composerProject} {$this->name}");
+        }
     }
 
     private function updateHostsFile(){

@@ -15,6 +15,7 @@ class Config{
     private $homesteadSitesPath;
     private $homesteadBoxPath;
     private $homesteadAccessDirectoryCommand;
+    private $accessLocalSitesDirectoryCommand;
 
     public function __construct()
     {
@@ -33,6 +34,7 @@ class Config{
         $this->homesteadBoxPath = getenv('HOMESTEAD_BOX_PATH');
         $this->homesteadAccessDirectoryCommand = getenv('HOMESTEAD_ACCESS_DIRECTORY_COMMAND');
         $this->domainExtension = getenv('DEFAULT_DOMAIN_EXTENSION');
+        $this->accessLocalSitesDirectoryCommand = getenv('ACCESS_LOCAL_SITES_DIRECTORY_COMMAND');
     }
 
     public static function hasEnvFile(){
@@ -81,6 +83,10 @@ class Config{
 
     public function getDomainExtension(){
         return $this->domainExtension;
+    }
+
+    public function getAccessLocalSitesDirectoryCommand(){
+        return $this->accessLocalSitesDirectoryCommand;
     }
 
 }
