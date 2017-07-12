@@ -232,7 +232,8 @@ class Host extends Command
         $this->outputInterface->writeln('<info>Provisioning Vagrant...</info>');
         $this->provisionHomestead();
 
-        $this->outputInterface->writeln('<success>Complete! Visit: http://'.$this->domain.'</success>');
+        $this->outputInterface->writeln('');
+        $this->outputInterface->writeln('<info>Complete! Visit: http://'.$this->domain.'</info>');
     }
 
     private function defaultDatabaseNameFromKey($key){
