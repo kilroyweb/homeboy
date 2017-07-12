@@ -3,17 +3,23 @@
 
 require __DIR__.'/vendor/autoload.php';
 
+require 'globals.php';
+
 use Symfony\Component\Console\Application;
 
-$dotenv = new Dotenv\Dotenv(__DIR__, '.env');
-$dotenv->load();
+if(\App\Configuration\Config::hasEnvFile()){
+    $dotenv = new Dotenv\Dotenv(__DIR__, '.env');
+    $dotenv->load();
+}
 
 $application = new Application();
 
+$setupCommand = new \App\Commands\Setup();
 $hostCommand = new \App\Commands\Host();
 $vagrantCommand = new \App\Commands\Vagrant();
 $fileCommand = new \App\Commands\File();
 
+$application->add($setupCommand);
 $application->add($hostCommand);
 $application->add($vagrantCommand);
 $application->add($fileCommand);

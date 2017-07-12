@@ -6,6 +6,7 @@ use App\Configuration\Config;
 use App\FileManagers\HomesteadFileManager;
 use App\FileManagers\HostsFileManager;
 use App\Input\Interrogator;
+use App\Support\Traits\RequireEnvFile;
 use App\Support\Vagrant\Vagrant;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,6 +15,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Host extends Command
 {
+
+    use RequireEnvFile;
 
     private $questionHelper;
     private $inputInterface;
@@ -46,6 +49,7 @@ class Host extends Command
     private function init(InputInterface $input, OutputInterface $output){
         $this->inputInterface = $input;
         $this->outputInterface = $output;
+        $this->hasEnvFile();
         $this->questionHelper = $this->getHelper('question');
         $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
         $this->config = new Config();

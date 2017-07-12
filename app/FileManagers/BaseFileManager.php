@@ -31,7 +31,7 @@ abstract class BaseFileManager{
         return file_get_contents($this->filePath);
     }
 
-    protected function newFileContents($contents){
+    public function newFileContents($contents){
         if($this->allowWriteFile){
             return file_put_contents($this->filePath, $contents);
         }else{
@@ -47,7 +47,6 @@ abstract class BaseFileManager{
             $contents .= PHP_EOL.$line;
             return $contents;
         }
-
     }
 
 }

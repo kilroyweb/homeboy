@@ -35,6 +35,10 @@ class Config{
         $this->domainExtension = getenv('DEFAULT_DOMAIN_EXTENSION');
     }
 
+    public static function hasEnvFile(){
+        return file_exists(basePath('.env'));
+    }
+
     public function getFolder(){
         return $this->folder;
     }
