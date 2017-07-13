@@ -58,10 +58,12 @@ homeboy=php C:\Users\[USER]\homeboy\homeboy $*
 
 ### Using Composer
 
+*Warning, this feature is currently in development*
+
 Install Homeboy using Composer:
 
 ```
-composer global require "kilroyweb/homeboy"
+composer global require "kilroyweb/homeboy" dev-master
 ```
 
 Make sure to place the $HOME/.composer/vendor/bin directory (or the equivalent directory for your OS) 
