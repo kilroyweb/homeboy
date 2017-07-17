@@ -52,12 +52,20 @@ class Config{
         return $this->composerProject;
     }
 
+    public function setHostsPath($hostsPath){
+        $this->hostsPath = $hostsPath;
+    }
+
     public function getHostsPath(){
         return $this->hostsPath;
     }
 
     public function getHostIP(){
         return $this->hostIP;
+    }
+
+    public function setHomesteadPath($homesteadPath){
+        $this->homesteadPath = $homesteadPath;
     }
 
     public function getHomesteadPath(){

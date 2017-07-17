@@ -19,4 +19,15 @@ class AppTestCase extends TestCase{
         return $basePath;
     }
 
+    public function createTemporaryFile($contents = null){
+        $filePointer = tmpfile();
+        fwrite($filePointer, $contents);
+        return $filePointer;
+    }
+
+    public function getTemporaryFilePath($filePointer){
+        $fileMeta = stream_get_meta_data($filePointer);
+        return $fileMeta['uri'];
+    }
+
 }
