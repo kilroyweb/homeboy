@@ -17,12 +17,7 @@ class Config{
     private $homesteadAccessDirectoryCommand;
     private $accessLocalSitesDirectoryCommand;
 
-    public function __construct()
-    {
-        $this->updateFromEnvironment();
-    }
-
-    private function updateFromEnvironment(){
+    public function updateFromEnvironment(){
         $this->folder = getenv('LOCAL_SITES_PATH');
         $this->folderSuffix = getenv('DEFAULT_FOLDER_SUFFIX');
         $this->useComposer = boolval(getenv('USE_COMPOSER'));

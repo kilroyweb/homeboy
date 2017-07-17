@@ -37,6 +37,12 @@ class Host extends Command
 
     private $vagrant;
 
+    public function __construct($name = null, Config $config)
+    {
+        $this->config = $config;
+        parent::__construct($name);
+    }
+
     protected function configure()
     {
         $this
@@ -52,7 +58,6 @@ class Host extends Command
         $this->hasEnvFile();
         $this->questionHelper = $this->getHelper('question');
         $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
-        $this->config = new Config();
         $vagrantAccessDirectoryCommand = 'cd '.$this->config->getHomesteadBoxPath();
         if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
             $vagrantAccessDirectoryCommand = $this->config->getHomesteadAccessDirectoryCommand();

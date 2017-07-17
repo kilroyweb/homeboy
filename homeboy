@@ -17,12 +17,15 @@ if(\App\Configuration\Config::hasEnvFile()){
     $dotenv->load();
 }
 
+$config = new App\Configuration\Config();
+$config->updateFromEnvironment();
+
 $application = new Application();
 
-$setupCommand = new \App\Commands\Setup();
-$hostCommand = new \App\Commands\Host();
-$vagrantCommand = new \App\Commands\Vagrant();
-$fileCommand = new \App\Commands\File();
+$setupCommand = new \App\Commands\Setup(null, $config);
+$hostCommand = new \App\Commands\Host(null, $config);
+$vagrantCommand = new \App\Commands\Vagrant(null, $config);
+$fileCommand = new \App\Commands\File(null, $config);
 
 $application->add($setupCommand);
 $application->add($hostCommand);

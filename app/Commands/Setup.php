@@ -35,6 +35,12 @@ class Setup extends Command
     private $baseUserDirectory;
     private $folder;
 
+    public function __construct($name = null, Config $config)
+    {
+        $this->config = $config;
+        parent::__construct($name);
+    }
+
     protected function configure()
     {
         $this
@@ -48,7 +54,6 @@ class Setup extends Command
         $this->outputInterface = $output;
         $this->questionHelper = $this->getHelper('question');
         $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
-        $this->config = new Config();
     }
 
     private function installTypes(){

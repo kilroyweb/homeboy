@@ -23,6 +23,12 @@ class File extends Command
     private $config;
     private $vagrant;
 
+    public function __construct($name = null, Config $config)
+    {
+        $this->config = $config;
+        parent::__construct($name);
+    }
+
     protected function configure()
     {
         $this
@@ -36,7 +42,6 @@ class File extends Command
         $this->inputInterface = $input;
         $this->outputInterface = $output;
         $this->hasEnvFile();
-        $this->config = new Config();
         $vagrantAccessDirectoryCommand = 'cd '.$this->config->getHomesteadBoxPath();
         if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
             $vagrantAccessDirectoryCommand = $this->config->getHomesteadAccessDirectoryCommand();
