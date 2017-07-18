@@ -10,9 +10,44 @@ Tool for automating sites using Laravel Homestead. With one command, Homeboy wil
 
 ![](https://j.gifs.com/y8KL0n.gif)
 
-## Installation + First Time Setup
+## Table of Contents
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+    - [Install as a global composer package (recommended)](#install-as-a-global-composer-package)
+    - [Install using git clone](#install-using-git-clone)
+  - [Setting Configuration](#setting-configuration)
+  - [Homeboy Commands](#homeboy-commands)
+    - [Host](#host)
+    - [File](#file)
+    - [Vagrant](#vagrant)
 
-*Requires Git, PHP, and Composer installed on your local (non-homestead machine)*
+## Requirements
+
+On your local (non homestead) machine, Homeboy requires:
+ - Git
+ - PHP
+ - Composer
+ 
+## Installation
+
+### Install as a global composer package
+ 
+```
+composer global require "kilroyweb/homeboy" dev-master
+```
+
+Make sure to place the $HOME/.composer/vendor/bin directory (or the equivalent directory for your OS) 
+in your $PATH so the laravel executable can be located by your system.
+
+Once installed, you can use ``homeboy`` command from anywhere on your system.
+
+Run the setup command to generate a .env file
+
+```
+php homeboy setup
+```
+
+### Install using git clone
 
 - On your local machine, clone Homeboy
 
@@ -55,24 +90,21 @@ homeboy=php C:\Users\[USER]\homeboy\homeboy $*
 
 *be sure to edit the path based on where homeboy is installed*
 
+## Setting Configuration
 
-### Using Composer
+After running ```homeboy setup```, you should have a .env file in your homeboy directory with a few options that can be managed:
 
-*Warning, this feature is currently in development*
+TODO
 
-Install Homeboy using Composer:
+## Homeboy Commands
+
+### Host
 
 ```
-composer global require "kilroyweb/homeboy" dev-master
+homeboy host
 ```
 
-Make sure to place the $HOME/.composer/vendor/bin directory (or the equivalent directory for your OS) 
-in your $PATH so the laravel executable can be located by your system.
-
-Once installed, you can use ``homeboy`` command from anywhere on your system.
-
-
-### Use Homeboy to host a new homestead site
+Because this is the default command, you can run host by simply running:
 
 ```
 homeboy
@@ -81,8 +113,6 @@ homeboy
 Running this command automates the task of creating a new composer project, updating your hosts file and vagrant files when provisioning a new website
 
 When the command runs, it prompts for the sites directory name, database name, and dev url to update the needed files and then provisions vagrant
-
-### Options
 
 A few options have been added to speed up the command. However because the command "homeboy" is simply a shortcut for "homeboy host" (allowing us to add additional commands in the future), options only work when calling "homeboy host" rather than just "homeboy".
 
@@ -108,7 +138,7 @@ Homeboy also contains the "vagrant" command, allowing you to quickly run any vag
 homeboy vagrant status
 ```
 
-### Viewing Files
+### File
 
 Quickly view a file contents by running:
 
