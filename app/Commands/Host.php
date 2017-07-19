@@ -201,6 +201,8 @@ class Host extends Command
                 $this->folderSuffix = $this->config->getFolderSuffix();
             }
 
+            $this->folderSuffix = rtrim($this->folderSuffix, "/");
+
             if(!$this->inputInterface->getOption('database')) {
                 $this->database = $this->defaultDatabaseNameFromKey($this->name);
                 $this->database = $this->interrogator->ask(
