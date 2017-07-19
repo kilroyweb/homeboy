@@ -110,7 +110,7 @@ Default package used when creating a composer project
 DEFAULT_COMPOSER_PROJECT=laravel/laravel
 ```
 
-#### DEFAULT_FOLDER_SUFFIX=/public
+#### DEFAULT_FOLDER_SUFFIX
 When hosting a new project, the default directory that nginx would define as the document root. For Laravel projects, by default this is "/public"
 
 ```
