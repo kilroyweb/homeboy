@@ -20,20 +20,11 @@ class Setup extends Command
     private $questionHelper;
     private $inputInterface;
     private $outputInterface;
-
     private $config;
-
-    private $composerProject;
-
-    private $database;
-    private $domain;
-
     private $interrogator;
-
     private $installType;
     private $systemUserName;
     private $baseUserDirectory;
-    private $folder;
 
     public function __construct($name = null, Config $config)
     {
@@ -88,7 +79,11 @@ class Setup extends Command
 | | | | (_) | | | | | |  __/ |_) | (_) | |_| |
 |_| |_|\___/|_| |_| |_|\___|_.__/ \___/ \__, |
                                         |___/ ');
-        $this->outputInterface->writeln('<comment>Version: '.ApplicationVersion::get().'</comment>');
+        if($this->config->getComposerGlobal()){
+            //TODO - output version by reading .composer's lock file
+        }else{
+            $this->outputInterface->writeln('<comment>Version: '.ApplicationVersion::get().'</comment>');
+        }
     }
 
     private function interrogate(){
