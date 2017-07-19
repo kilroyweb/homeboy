@@ -7,7 +7,7 @@ if(file_exists(__DIR__.'/vendor/autoload.php')){
     require __DIR__.'/vendor/autoload.php';
 }else{
     $composerGlobal = true;
-    $dotEnvDirectory = __DIR__.'/../../../';
+    $dotEnvDirectory = __DIR__.'/../../..';
     $dotEnvFileName = '.homeboy';
     require __DIR__.'/../../autoload.php';
 }
