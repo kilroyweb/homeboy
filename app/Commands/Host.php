@@ -25,6 +25,7 @@ class Host extends Command
     private $config;
 
     private $name;
+    private $useComposer;
     private $composerProject;
     private $folder;
     private $folderSuffix;
@@ -79,6 +80,13 @@ class Host extends Command
             'Skip Confirmation'
         );
         $this->addOption(
+            'use-composer',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Use Composer',
+            null
+        );
+        $this->addOption(
             'name',
             null,
             InputOption::VALUE_REQUIRED,
@@ -130,6 +138,9 @@ class Host extends Command
         if($this->inputInterface->getOption('skip-confirmation')){
             $this->skipConfirmation = boolval($this->inputInterface->getOption('skip-confirmation'));
         }
+        if($this->inputInterface->getOption('use-composer')){
+            $this->useComposer = boolval($this->inputInterface->getOption('use-composer'));
+        }
         if($this->inputInterface->getOption('name')){
             $this->name = $this->inputInterface->getOption('name');
         }
@@ -155,7 +166,21 @@ class Host extends Command
                 );
             }
 
-            if ($this->config->getUseComposer()) {
+            $useComposerDefault = 'Y';
+            if(!$this->config->getUseComposer()){
+                $useComposerDefault = 'N';
+            }
+            $useComposerInput = $this->interrogator->ask(
+                'Use Composer?',
+                $useComposerDefault
+            );
+            if(strtoupper($useComposerInput) == 'Y'){
+                $this->useComposer = true;
+            }else{
+                $this->useComposer = false;
+            }
+
+            if ($this->useComposer) {
                 $this->composerProject = $this->interrogator->ask(
                     'What composer project?',
                     $this->config->getComposerProject()
@@ -197,7 +222,7 @@ class Host extends Command
 
     private function getTaskConfirmationFromQuestion(){
         $this->outputInterface->writeln('<info>The following tasks will be executed:</info>');
-        if($this->config->getUseComposer() && !empty($this->composerProject)){
+        if($this->useComposer){
             $this->outputInterface->writeln("- Run Command: cd {$this->folder} && composer create-project {$this->composerProject} {$this->name}");
         }
         $this->outputInterface->writeln('- ('.$this->config->getHostsPath().') add line: '.$this->config->getHostIP().' '.$this->domain);
@@ -220,7 +245,7 @@ class Host extends Command
     }
 
     private function runTasks(){
-        if($this->config->getUseComposer() && !empty($this->composerProject)){
+        if($this->useComposer){
             $this->outputInterface->writeln('<info>Creating project...</info>');
             $this->createProject();
         }
