@@ -56,7 +56,7 @@ class Host extends Command
     private function init(InputInterface $input, OutputInterface $output){
         $this->inputInterface = $input;
         $this->outputInterface = $output;
-        $this->hasEnvFile();
+        $this->hasDotEnvFile();
         $this->questionHelper = $this->getHelper('question');
         $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
         $vagrantAccessDirectoryCommand = 'cd '.$this->config->getHomesteadBoxPath();

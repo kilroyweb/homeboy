@@ -2,12 +2,10 @@
 
 namespace App\Support\Traits;
 
-use App\Configuration\Config;
-
 trait RequireEnvFile{
 
-    private function hasEnvFile(){
-        if(!Config::hasEnvFile()){
+    private function hasDotEnvFile(){
+        if($this->config->hasDotEnvFile()){
             $this->outputInterface->writeln('<error>No .env file found. Run "homeboy setup"</error>');
             die();
         }

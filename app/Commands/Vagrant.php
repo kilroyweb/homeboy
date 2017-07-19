@@ -41,7 +41,7 @@ class Vagrant extends Command
     private function init(InputInterface $input, OutputInterface $output){
         $this->inputInterface = $input;
         $this->outputInterface = $output;
-        $this->hasEnvFile();
+        $this->hasDotEnvFile();
         $vagrantAccessDirectoryCommand = 'cd '.$this->config->getHomesteadBoxPath();
         if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
             $vagrantAccessDirectoryCommand = $this->config->getHomesteadAccessDirectoryCommand();
