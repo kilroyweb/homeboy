@@ -92,9 +92,106 @@ homeboy=php C:\Users\[USER]\homeboy\homeboy $*
 
 ## Setting Configuration
 
-After running ```homeboy setup```, you should have a .env file in your homeboy directory with a few options that can be managed:
+After running ```homeboy setup```, you should have a .env file in your homeboy directory with a few defaults that have been generated.
 
-TODO
+These options will likely need to be updated based on your particular setup, details about each available setting are listed below:
+
+#### USE_COMPOSER 
+Default option to determine if homeboy should create a new composer project
+
+```
+USE_COMPOSER=true
+```
+
+#### DEFAULT_COMPOSER_PROJECT 
+Default package used when creating a composer project
+
+```
+DEFAULT_COMPOSER_PROJECT=laravel/laravel
+```
+
+#### DEFAULT_FOLDER_SUFFIX=/public
+When hosting a new project, the default directory that nginx would define as the document root. For Laravel projects, by default this is "/public"
+
+```
+DEFAULT_FOLDER_SUFFIX=/public
+```
+
+#### DEFAULT_DOMAIN_EXTENSION
+When creating development domains, the default domain suffix given when a domain is generated
+
+```
+DEFAULT_DOMAIN_EXTENSION=.app
+```
+
+#### HOSTS_FILE_PATH
+The location to your local hosts file that homeboy will add to when hosting new projects
+
+This file will need to have permissions adjusted to be editable by homeboy
+
+```
+HOSTS_FILE_PATH=/etc/hosts
+```
+
+#### HOMESTEAD_HOST_IP
+
+The ip address given to your homestead virtual machine. This is likely found in your Homestead.yaml file
+
+```
+HOMESTEAD_HOST_IP=192.168.10.10
+```
+
+#### HOMESTEAD_FILE_PATH
+
+The location to your Homestead.yaml file. Homeboy will update this file's sites list and database list when creating new projects
+
+```
+HOMESTEAD_FILE_PATH=/Users/Username/Homestead/Homestead.yaml
+```
+
+#### HOMESTEAD_SITES_PATH
+
+The root path to your websites in your homestead virtual machine 
+
+```
+HOMESTEAD_SITES_PATH=/home/vagrant/Code/
+```
+
+#### HOMESTEAD_BOX_PATH
+
+The path to your Homestead directory
+
+```
+HOMESTEAD_BOX_PATH=/Users/Username/Homestead
+```
+
+#### LOCAL_SITES_PATH
+
+The path on your local machine to where you store your projects. Homeboy will cd into this directory when running "composer create-project ..."
+
+```
+LOCAL_SITES_PATH=/Users/Username/Code
+```
+
+#### HOMESTEAD_ACCESS_DIRECTORY_COMMAND
+
+In Windows if you are running Homestead on a different drive, an extra command may be required to switch drives before cd'ing into your directory.
+
+This option will cause Homeboy to ignore the option: HOMESTEAD_BOX_PATH
+
+```
+HOMESTEAD_ACCESS_DIRECTORY_COMMAND="cd /d D: && cd /Homestead"
+```
+
+#### ACCESS_LOCAL_SITES_DIRECTORY_COMMAND
+
+Similar to HOMESTEAD_ACCESS_DIRECTORY_COMMAND, In Windows if your root project directory is on a different drive, an extra command may be required to switch drives before cd'ing into your directory.
+
+This option will cause Homeboy to ignore the option: LOCAL_SITES_PATH
+
+```
+ACCESS_LOCAL_SITES_DIRECTORY_COMMAND="cd /d D: && cd /Code"
+```
 
 ## Homeboy Commands
 
