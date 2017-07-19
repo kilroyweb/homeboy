@@ -68,8 +68,8 @@ class Setup extends Command
     {
         $this->init($input, $output);
         $this->outputLogo();
-        if(Config::hasEnvFile()){
-            $this->outputInterface->writeln('<error>.env file already exists!</error>');
+        if($this->config->hasDotEnvFile()){
+            $this->outputInterface->writeln('<error>'.$this->config->dotEnvFilePath().' file already exists!</error>');
             die();
         }
         $this->outputInterface->writeln('<info>This process attempt to create a new .env file in your homeboy directory.</info>');
@@ -107,13 +107,13 @@ class Setup extends Command
     }
 
     private function runTasks(){
-        $envPath = basePath('.env');
+        $envPath = $this->config->dotEnvFilePath();
         $envContents = $this->generateEnvContents();
         $this->outputInterface->writeln('Writing content to '.$envPath.':');
         $this->outputInterface->writeln($envContents);
         $fileManager = new EnvFileManager($envPath);
         $fileManager->newFileContents($envContents);
-        $this->outputInterface->writeln('<info>Complete! Review your generated .env file at '.$envPath.'</info>');
+        $this->outputInterface->writeln('<info>Complete! Review your generated file at '.$envPath.'</info>');
     }
 
     private function generateEnvContents(){

@@ -1,10 +1,14 @@
 #!/usr/bin/env php
 <?php
-
+$composerGlobal = false;
+$dotEnvDirectory = __DIR__;
+$dotEnvFileName = '.env';
 if(file_exists(__DIR__.'/vendor/autoload.php')){
     require __DIR__.'/vendor/autoload.php';
 }else{
-    //If global package, pull composers global autoloader
+    $composerGlobal = true;
+    $dotEnvDirectory = __DIR__.'/../../../';
+    $dotEnvFileName = '.homeboy';
     require __DIR__.'/../../autoload.php';
 }
 
@@ -12,13 +16,16 @@ require 'globals.php';
 
 use Symfony\Component\Console\Application;
 
-if(\App\Configuration\Config::hasEnvFile()){
-    $dotenv = new Dotenv\Dotenv(__DIR__, '.env');
-    $dotenv->load();
-}
-
 $config = new App\Configuration\Config();
-$config->updateFromEnvironment();
+$config->setComposerGlobal($composerGlobal);
+$config->setDotEnvDirectory($dotEnvDirectory);
+$config->setDotEnvFileName($dotEnvFileName);
+
+if($config->hasDotEnvFile()){
+    $dotenv = new Dotenv\Dotenv($dotEnvDirectory, $dotEnvFileName);
+    $dotenv->load();
+    $config->updateFromEnvironment();
+}
 
 $application = new Application();
 

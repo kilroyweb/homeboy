@@ -16,6 +16,9 @@ class Config{
     private $homesteadBoxPath;
     private $homesteadAccessDirectoryCommand;
     private $accessLocalSitesDirectoryCommand;
+    private $composerGlobal;
+    private $dotEnvDirectory;
+    private $dotEnvFileName;
 
     public function updateFromEnvironment(){
         $this->folder = getenv('LOCAL_SITES_PATH');
@@ -32,8 +35,12 @@ class Config{
         $this->accessLocalSitesDirectoryCommand = getenv('ACCESS_LOCAL_SITES_DIRECTORY_COMMAND');
     }
 
-    public static function hasEnvFile(){
-        return file_exists(basePath('.env'));
+    public function dotEnvFilePath(){
+        return $this->getDotEnvDirectory().'/'.$this->getDotEnvFileName();
+    }
+
+    public function hasDotEnvFile(){
+        return file_exists($this->dotEnvFilePath());
     }
 
     public function getFolder(){
@@ -90,6 +97,30 @@ class Config{
 
     public function getAccessLocalSitesDirectoryCommand(){
         return $this->accessLocalSitesDirectoryCommand;
+    }
+
+    public function setComposerGlobal($composerGlobal){
+        return $this->composerGlobal = $composerGlobal;
+    }
+
+    public function getComposerGlobal(){
+        return $this->composerGlobal;
+    }
+
+    public function setDotEnvDirectory($dotEnvDirectory){
+        $this->dotEnvDirectory = $dotEnvDirectory;
+    }
+
+    public function getDotEnvDirectory(){
+        return $this->dotEnvDirectory;
+    }
+
+    public function setDotEnvFileName($dotEnvFileName){
+        $this->dotEnvFileName = $dotEnvFileName;
+    }
+
+    public function getDotEnvFileName(){
+        return $this->dotEnvFileName;
     }
 
 }
