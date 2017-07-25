@@ -159,6 +159,8 @@ class Host extends Command
     private function interrogate(){
 
         $projectName = 'project-' . time();
+        $this->useComposer = $this->config->getUseComposer();
+        $this->composerProject = $this->config->getComposerProject();
 
 
         if($this->useDefaults){
