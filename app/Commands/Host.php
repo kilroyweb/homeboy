@@ -157,12 +157,26 @@ class Host extends Command
     }
 
     private function interrogate(){
-        if(!$this->useDefaults) {
+
+        $projectName = 'project-' . time();
+
+
+        if($this->useDefaults){
+
+            if(is_null($this->name)) {
+                $this->name = $projectName;
+            }
+            $this->folderSuffix = $this->config->getFolderSuffix();
+            $this->folderSuffix = rtrim($this->folderSuffix, "/");
+            $this->database = $this->defaultDatabaseNameFromKey($this->name);
+            $this->domain = $this->defaultDomainNameFromKey($this->name);
+
+        }else{
 
             if(is_null($this->name)){
                 $this->name = $this->interrogator->ask(
                     'What is your project\'s name?',
-                    'project-' . time()
+                    $projectName
                 );
             }
 
