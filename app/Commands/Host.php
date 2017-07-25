@@ -168,6 +168,7 @@ class Host extends Command
             if(is_null($this->name)) {
                 $this->name = $projectName;
             }
+            $this->folder = $this->config->getFolder();
             $this->folderSuffix = $this->config->getFolderSuffix();
             $this->folderSuffix = rtrim($this->folderSuffix, "/");
             $this->database = $this->defaultDatabaseNameFromKey($this->name);
