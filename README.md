@@ -20,6 +20,7 @@ Tool for automating sites using Laravel Homestead. With one command, Homeboy wil
     - [Host](#host)
     - [File](#file)
     - [Vagrant](#vagrant)
+  - [Troubleshooting](#troubleshooting)
 
 ## Requirements
 
@@ -246,4 +247,24 @@ or
 
 ```
 homeboy file homestead
+```
+
+## Troubleshooting
+
+### Homeboy is running composer install within my current directory, rather than my defined LOCAL_SITES_PATH
+
+A common cause of this on Windows is when LOCAL_SITES_PATH is in a different drive than where the homeboy command is being run. Since Windows must first change drives before cd'ing into the directory, you can use the "ACCESS_LOCAL_SITES_DIRECTORY_COMMAND" to overwrite how homeboy accesses this directory. For example:
+
+```
+ACCESS_LOCAL_SITES_DIRECTORY_COMMAND="cd /d D: && cd /Code"
+```
+
+### Vagrant returns "A Vagrant environment or target machine is required to run this command"
+
+This message will be displayed when Homeboy is unable to cd into the proper vagrant directory when running vagrant commands. Please verify your "HOMESTEAD_BOX_PATH" value to ensure it is correct.
+
+On Windows, if your HOMESTEAD_BOX_PATH is in a different drive than the drive you are running your homeboy command, you may need to add the "HOMESTEAD_ACCESS_DIRECTORY_COMMAND" to add any additional commands (such as switching drives) when accessing the directory. For example:
+
+```
+HOMESTEAD_ACCESS_DIRECTORY_COMMAND="cd /d D: && cd /Homestead"
 ```
