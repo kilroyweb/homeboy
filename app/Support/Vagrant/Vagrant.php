@@ -15,12 +15,20 @@ class Vagrant{
         $this->accessDirectoryCommand = $accessDirectoryCommand;
     }
 
+    public function getAccessDirectoryCommand(){
+        return $this->accessDirectoryCommand;
+    }
+
     public function provision(){
         return $this->runAction('provision');
     }
 
+    public function getActionCommand($action){
+        return $this->getAccessDirectoryCommand().' && vagrant '.$action;
+    }
+
     public function runAction($action){
-        return shell_exec($this->accessDirectoryCommand.' && vagrant '.$action);
+        return shell_exec($this->getActionCommand($action));
     }
 
 }
