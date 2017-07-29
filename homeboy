@@ -33,11 +33,13 @@ $setupCommand = new \App\Commands\Setup(null, $config);
 $hostCommand = new \App\Commands\Host(null, $config);
 $vagrantCommand = new \App\Commands\Vagrant(null, $config);
 $fileCommand = new \App\Commands\File(null, $config);
+$domainCommand = new \App\Commands\Domain(null, $config);
 
 $application->add($setupCommand);
 $application->add($hostCommand);
 $application->add($vagrantCommand);
 $application->add($fileCommand);
+$application->add($domainCommand);
 
 $application->setDefaultCommand($hostCommand->getName());
 

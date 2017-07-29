@@ -6,7 +6,7 @@ class DomainTest extends \Tests\AppTestCase\AppTestCase
     public function test_add()
     {
 
-        /*$hostsFileContents = "192.168.10.10 example1.app";
+        $hostsFileContents = "192.168.10.10 example1.app";
 
         $hostsFile = $this->createTemporaryFile($hostsFileContents);
         $hostsFilePath = $this->getTemporaryFilePath($hostsFile);
@@ -19,12 +19,17 @@ class DomainTest extends \Tests\AppTestCase\AppTestCase
 
         $command = $application->find('domain');
         $commandTester = new \Symfony\Component\Console\Tester\CommandTester($command);
+        $commandTester->setInputs([
+            'demo.dev',
+            '10.10.10.10',
+            'y'
+        ]);
         $commandTester->execute(array(
             'command'  => $command->getName(),
         ));
         $output = $commandTester->getDisplay();
-        print_r($output);
-        //$this->assertContains($hostsFileContents, $output);*/
+        $expectedHostFileContents = '10.10.10.10 demo.dev';
+        $this->assertContains($expectedHostFileContents, file_get_contents($hostsFilePath));
     }
 
 }
