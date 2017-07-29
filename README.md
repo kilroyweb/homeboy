@@ -21,6 +21,7 @@ Tool for automating sites using Laravel Homestead. With one command, Homeboy wil
     - [File](#file)
     - [Vagrant](#vagrant)
     - [Domain](#domain)
+    - [Composer](#composer)
   - [Troubleshooting](#troubleshooting)
 
 ## Requirements
@@ -258,7 +259,12 @@ The domain command lets you quickly add a new domain record to your hosts file.
 homeboy domain
 ```
 
-Homeboy will prompt the domain as well as the ip address
+### Composer
+
+The composer:create-project command prompts you details on running a "composer create-project [composer-project] [project-name]" command
+```
+homeboy composer:create-project
+```
 
 ## Troubleshooting
 

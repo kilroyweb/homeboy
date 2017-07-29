@@ -4,14 +4,16 @@ namespace App\Actions;
 
 use App\Actions\Interfaces\ActionInterface;
 
-class ComposerCreateProject extends BaseAction implements ActionInterface {
+class ComposerCreateProjectAction extends BaseAction implements ActionInterface {
 
+    private $commandExecutor;
     private $accessCommand;
     private $project;
     private $name;
 
-    public function __construct($accessCommand, $project, $name)
+    public function __construct($commandExecutor, $accessCommand, $project, $name)
     {
+        $this->commandExecutor = $commandExecutor;
         $this->accessCommand = $accessCommand;
         $this->project = $project;
         $this->name = $name;
@@ -30,7 +32,7 @@ class ComposerCreateProject extends BaseAction implements ActionInterface {
     }
 
     public function run(){
-        $shellOutput = shell_exec($this->command());
+        $this->commandExecutor->run($this->command());
     }
 
 }

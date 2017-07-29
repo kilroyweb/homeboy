@@ -29,17 +29,19 @@ if($config->hasDotEnvFile()){
 
 $application = new Application();
 
-$setupCommand = new \App\Commands\Setup(null, $config);
 $hostCommand = new \App\Commands\Host(null, $config);
-$vagrantCommand = new \App\Commands\Vagrant(null, $config);
-$fileCommand = new \App\Commands\File(null, $config);
-$domainCommand = new \App\Commands\Domain(null, $config);
 
-$application->add($setupCommand);
-$application->add($hostCommand);
-$application->add($vagrantCommand);
-$application->add($fileCommand);
-$application->add($domainCommand);
+$commands = [
+    new \App\Commands\Setup(null, $config),
+    new \App\Commands\Vagrant(null, $config),
+    new \App\Commands\File(null, $config),
+    new \App\Commands\Domain(null, $config),
+    new \App\Commands\ComposerCreateProject(null, $config),
+];
+
+foreach($commands as $command){
+    $application->add($command);
+}
 
 $application->setDefaultCommand($hostCommand->getName());
 

@@ -2,7 +2,7 @@
 
 namespace App\Commands;
 
-use App\Actions\ComposerCreateProject;
+use App\Actions\ComposerCreateProjectAction;
 use App\Actions\HomesteadAddDatabase;
 use App\Actions\HomesteadMapSite;
 use App\Actions\HostsAddLine;
@@ -17,6 +17,7 @@ use App\Configuration\Config;
 use App\Formatters\DatabaseNameFormatter;
 use App\Formatters\DomainFormatter;
 use App\Input\Interrogator;
+use App\Support\Traits\HasCommandExecutor;
 use App\Support\Traits\HasCommandOptions;
 use App\Support\Traits\RequireEnvFile;
 use App\Support\Vagrant\Vagrant;
@@ -29,6 +30,7 @@ class Host extends Command
 
     use RequireEnvFile;
     use HasCommandOptions;
+    use HasCommandExecutor;
 
     private $questionHelper;
     private $inputInterface;
@@ -49,6 +51,8 @@ class Host extends Command
     private $interrogator;
 
     private $vagrant;
+
+    private $commandExecutor;
 
     public function __construct($name = null, Config $config)
     {
@@ -222,7 +226,7 @@ class Host extends Command
         }else{
             $accessCommand = 'cd '.$this->folder;
         }
-        return new ComposerCreateProject($accessCommand, $this->composerProject, $this->name);
+        return new ComposerCreateProjectAction($this->commandExecutor, $accessCommand, $this->composerProject, $this->name);
     }
 
     private function hostsAddLineAction(){

@@ -2,20 +2,22 @@
 
 namespace App\Commands;
 
-use App\Actions\HostsAddLine;
+use App\Actions\ComposerCreateProjectAction;
 use App\Configuration\Config;
 use App\Input\Interrogator;
+use App\Support\Traits\HasCommandExecutor;
 use App\Support\Traits\HasCommandOptions;
 use App\Support\Traits\RequireEnvFile;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Domain extends Command
+class ComposerCreateProject extends Command
 {
 
     use RequireEnvFile;
     use HasCommandOptions;
+    use HasCommandExecutor;
 
     private $questionHelper;
     private $inputInterface;
@@ -23,10 +25,13 @@ class Domain extends Command
 
     private $config;
 
-    private $ipAddress;
-    private $domain;
+    private $projectDirectory;
+    private $composerProject;
+    private $projectName;
 
     private $interrogator;
+
+    private $commandExecutor;
 
     public function __construct($name = null, Config $config)
     {
@@ -37,8 +42,8 @@ class Domain extends Command
     protected function configure()
     {
         $this
-            ->setName('domain')
-            ->setDescription('Update hosts file to map new domain')
+            ->setName('composer:create-project')
+            ->setDescription('Create a new composer project')
             ->setHelp("");
     }
 
@@ -69,26 +74,36 @@ class Domain extends Command
 
     private function interrogate(){
 
-        $this->domain = $this->interrogator->ask(
-            'Domain?',
-            'project-'.time().$this->config->getDomainExtension()
+        $this->projectDirectory = $this->interrogator->ask(
+            'Directory to create project?',
+            $this->config->getFolder()
         );
 
-        $this->ipAddress = $this->interrogator->ask(
-            'IP Address?',
-            $this->config->getHostIP()
+        $this->composerProject = $this->interrogator->ask(
+            'Composer project',
+            $this->config->getComposerProject()
+        );
+
+        $this->projectName = $this->interrogator->ask(
+            'Project directory name',
+            'project-'.time()
         );
 
     }
 
-    private function hostsAddLineAction(){
-        return new HostsAddLine($this->config->getHostsPath(), $this->ipAddress, $this->domain);
+    private function composerCreateProjectAction(){
+        if(!empty($this->config->getAccessLocalSitesDirectoryCommand())){
+            $accessCommand = $this->config->getAccessLocalSitesDirectoryCommand();
+        }else{
+            $accessCommand = 'cd '.$this->projectDirectory;
+        }
+        return new ComposerCreateProjectAction($this->commandExecutor,$accessCommand, $this->composerProject, $this->projectName);
     }
 
     private function getTaskConfirmationFromQuestion(){
         $this->outputInterface->writeln('<info>The following tasks will be executed:</info>');
 
-        $this->outputInterface->writeln('- '.$this->hostsAddLineAction()->confirmationMessage());
+        $this->outputInterface->writeln('- '.$this->composerCreateProjectAction()->confirmationMessage());
 
         $response = $this->interrogator->ask(
             'Run tasks?',
@@ -102,8 +117,8 @@ class Domain extends Command
 
     private function runTasks(){
 
-        $this->outputInterface->writeln('<info>'.$this->hostsAddLineAction()->actionMessage().'...</info>');
-        $this->hostsAddLineAction()->run();
+        $this->outputInterface->writeln('<info>'.$this->composerCreateProjectAction()->actionMessage().'...</info>');
+        $this->composerCreateProjectAction()->run();
         $this->outputInterface->writeln('');
         $this->outputInterface->writeln('<info>Complete!</info>');
     }
