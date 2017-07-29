@@ -20,6 +20,7 @@ Tool for automating sites using Laravel Homestead. With one command, Homeboy wil
     - [Host](#host)
     - [File](#file)
     - [Vagrant](#vagrant)
+    - [Domain](#domain)
   - [Troubleshooting](#troubleshooting)
 
 ## Requirements
@@ -248,6 +249,16 @@ or
 ```
 homeboy file homestead
 ```
+
+### Domain
+
+The domain command lets you quickly add a new domain record to your hosts file.
+
+```
+homeboy domain
+```
+
+Homeboy will prompt the domain as well as the ip address
 
 ## Troubleshooting
 
