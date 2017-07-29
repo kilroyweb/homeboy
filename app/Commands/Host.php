@@ -17,6 +17,7 @@ use App\Configuration\Config;
 use App\Formatters\DatabaseNameFormatter;
 use App\Formatters\DomainFormatter;
 use App\Input\Interrogator;
+use App\Support\Traits\HasCommandOptions;
 use App\Support\Traits\RequireEnvFile;
 use App\Support\Vagrant\Vagrant;
 use Symfony\Component\Console\Command\Command;
@@ -27,6 +28,7 @@ class Host extends Command
 {
 
     use RequireEnvFile;
+    use HasCommandOptions;
 
     private $questionHelper;
     private $inputInterface;
@@ -74,17 +76,6 @@ class Host extends Command
             $vagrantAccessDirectoryCommand = $this->config->getHomesteadAccessDirectoryCommand();
         }
         $this->vagrant = new Vagrant($vagrantAccessDirectoryCommand);
-    }
-
-    private function addOptionFromClassName($className){
-        $instance = new $className;
-        $this->addOption(
-            $instance->getName(),
-            $instance->getShortcut(),
-            $instance->getMode(),
-            $instance->getDescription(),
-            $instance->getDefault()
-        );
     }
 
     private function addCommandOptions(){
@@ -238,11 +229,11 @@ class Host extends Command
         return new HostsAddLine($this->config->getHostsPath(), $this->config->getHostIP(), $this->domain);
     }
 
-    private function homesteadMapSite(){
+    private function homesteadMapSiteAction(){
         return new HomesteadMapSite($this->config->getHomesteadPath(), $this->domain, $this->config->getHomesteadSitesPath().$this->name.$this->folderSuffix);
     }
 
-    private function homesteadAddDatabase(){
+    private function homesteadAddDatabaseAction(){
         return new HomesteadAddDatabase($this->config->getHomesteadPath(), $this->database);
     }
 
@@ -258,8 +249,8 @@ class Host extends Command
         }
 
         $this->outputInterface->writeln('- '.$this->hostsAddLineAction()->confirmationMessage());
-        $this->outputInterface->writeln('- '.$this->homesteadMapSite()->confirmationMessage());
-        $this->outputInterface->writeln('- '.$this->homesteadAddDatabase()->confirmationMessage());
+        $this->outputInterface->writeln('- '.$this->homesteadMapSiteAction()->confirmationMessage());
+        $this->outputInterface->writeln('- '.$this->homesteadAddDatabaseAction()->confirmationMessage());
 
         $this->outputInterface->writeln('- '.$this->provisionHomesteadAction()->confirmationMessage() );
 
@@ -282,11 +273,11 @@ class Host extends Command
         $this->outputInterface->writeln('<info>'.$this->hostsAddLineAction()->actionMessage().'...</info>');
         $this->hostsAddLineAction()->run();
 
-        $this->outputInterface->writeln('<info>'.$this->homesteadMapSite()->actionMessage().'...</info>');
-        $this->homesteadMapSite()->run();
+        $this->outputInterface->writeln('<info>'.$this->homesteadMapSiteAction()->actionMessage().'...</info>');
+        $this->homesteadMapSiteAction()->run();
 
-        $this->outputInterface->writeln('<info>'.$this->homesteadAddDatabase()->actionMessage().'...</info>');
-        $this->homesteadAddDatabase()->run();
+        $this->outputInterface->writeln('<info>'.$this->homesteadAddDatabaseAction()->actionMessage().'...</info>');
+        $this->homesteadAddDatabaseAction()->run();
 
         $this->outputInterface->writeln('<info>'.$this->provisionHomesteadAction()->actionMessage().'...</info>');
         $this->provisionHomesteadAction()->run();
