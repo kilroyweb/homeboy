@@ -83,6 +83,10 @@ class Config{
         return $this->homesteadSitesPath;
     }
 
+    public function setHomesteadBoxPath($homesteadBoxPath){
+        $this->homesteadBoxPath = $homesteadBoxPath;
+    }
+
     public function getHomesteadBoxPath(){
         return $this->homesteadBoxPath;
     }

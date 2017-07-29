@@ -6,7 +6,7 @@ use App\Actions\ComposerCreateProjectAction;
 use App\Actions\HomesteadAddDatabase;
 use App\Actions\HomesteadMapSite;
 use App\Actions\HostsAddLine;
-use App\Actions\ProvisionHomestead;
+use App\Actions\VagrantRunAction;
 use App\Commands\Options\DatabaseOption;
 use App\Commands\Options\DomainOption;
 use App\Commands\Options\ProjectNameOption;
@@ -20,7 +20,6 @@ use App\Input\Interrogator;
 use App\Support\Traits\HasCommandExecutor;
 use App\Support\Traits\HasCommandOptions;
 use App\Support\Traits\RequireEnvFile;
-use App\Support\Vagrant\Vagrant;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -50,8 +49,6 @@ class Host extends Command
 
     private $interrogator;
 
-    private $vagrant;
-
     private $commandExecutor;
 
     public function __construct($name = null, Config $config)
@@ -75,11 +72,6 @@ class Host extends Command
         $this->hasDotEnvFile();
         $this->questionHelper = $this->getHelper('question');
         $this->interrogator = new Interrogator($input, $output, $this->getHelper('question'));
-        $vagrantAccessDirectoryCommand = 'cd '.$this->config->getHomesteadBoxPath();
-        if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
-            $vagrantAccessDirectoryCommand = $this->config->getHomesteadAccessDirectoryCommand();
-        }
-        $this->vagrant = new Vagrant($vagrantAccessDirectoryCommand);
     }
 
     private function addCommandOptions(){
@@ -229,6 +221,15 @@ class Host extends Command
         return new ComposerCreateProjectAction($this->commandExecutor, $accessCommand, $this->composerProject, $this->name);
     }
 
+    private function vagrantRunProvisionAction(){
+        if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
+            $accessCommand = $this->config->getHomesteadAccessDirectoryCommand();
+        }else{
+            $accessCommand = 'cd '.$this->config->getHomesteadBoxPath();
+        }
+        return new VagrantRunAction($this->getCommandExecutor(),$accessCommand, 'provision');
+    }
+
     private function hostsAddLineAction(){
         return new HostsAddLine($this->config->getHostsPath(), $this->config->getHostIP(), $this->domain);
     }
@@ -239,10 +240,6 @@ class Host extends Command
 
     private function homesteadAddDatabaseAction(){
         return new HomesteadAddDatabase($this->config->getHomesteadPath(), $this->database);
-    }
-
-    private function provisionHomesteadAction(){
-        return new ProvisionHomestead($this->vagrant);
     }
 
     private function getTaskConfirmationFromQuestion(){
@@ -256,7 +253,7 @@ class Host extends Command
         $this->outputInterface->writeln('- '.$this->homesteadMapSiteAction()->confirmationMessage());
         $this->outputInterface->writeln('- '.$this->homesteadAddDatabaseAction()->confirmationMessage());
 
-        $this->outputInterface->writeln('- '.$this->provisionHomesteadAction()->confirmationMessage() );
+        $this->outputInterface->writeln('- '.$this->vagrantRunProvisionAction()->confirmationMessage() );
 
         $response = $this->interrogator->ask(
             'Run tasks?',
@@ -283,8 +280,8 @@ class Host extends Command
         $this->outputInterface->writeln('<info>'.$this->homesteadAddDatabaseAction()->actionMessage().'...</info>');
         $this->homesteadAddDatabaseAction()->run();
 
-        $this->outputInterface->writeln('<info>'.$this->provisionHomesteadAction()->actionMessage().'...</info>');
-        $this->provisionHomesteadAction()->run();
+        $this->outputInterface->writeLn($this->vagrantRunProvisionAction()->actionMessage());
+        $this->vagrantRunProvisionAction()->run();
 
         $this->outputInterface->writeln('');
         $this->outputInterface->writeln('<info>Complete! Visit: http://'.$this->domain.'</info>');

@@ -15,7 +15,7 @@ class ComposerCreateProjectTest extends \Tests\AppTestCase\AppTestCase
         $commandExecutor = new \App\Support\Shell\CommandExecutor();
         $commandExecutor->setExecute(false);
 
-        $composerCreateProjectCommand = new \App\Commands\ComposerCreateProject(null, $config);
+        $composerCreateProjectCommand = new \App\Commands\Composer\ComposerCreateProject(null, $config);
         $composerCreateProjectCommand->setCommandExecutor($commandExecutor);
 
         $application = new \Symfony\Component\Console\Application();

@@ -32,11 +32,12 @@ $application = new Application();
 $hostCommand = new \App\Commands\Host(null, $config);
 
 $commands = [
+    $hostCommand,
     new \App\Commands\Setup(null, $config),
-    new \App\Commands\Vagrant(null, $config),
+    new \App\Commands\Vagrant\VagrantRun(null, $config),
     new \App\Commands\File(null, $config),
     new \App\Commands\Domain(null, $config),
-    new \App\Commands\ComposerCreateProject(null, $config),
+    new \App\Commands\Composer\ComposerCreateProject(null, $config),
 ];
 
 foreach($commands as $command){

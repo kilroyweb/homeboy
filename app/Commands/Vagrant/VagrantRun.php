@@ -1,27 +1,30 @@
 <?php
 
-namespace App\Commands;
+namespace App\Commands\Vagrant;
 
+use App\Actions\VagrantRunAction;
 use App\Configuration\Config;
+use App\Support\Traits\HasCommandExecutor;
 use App\Support\Traits\RequireEnvFile;
-use App\Support\Vagrant\Vagrant as VagrantSupport;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Vagrant extends Command
+class VagrantRun extends Command
 {
 
     use RequireEnvFile;
+    use HasCommandExecutor;
 
     private $inputInterface;
     private $outputInterface;
 
     private $action;
 
-    private $vagrant;
     private $config;
+
+    private $commandExecutor;
 
     public function __construct($name = null, Config $config)
     {
@@ -32,7 +35,7 @@ class Vagrant extends Command
     protected function configure()
     {
         $this
-            ->setName('vagrant')
+            ->setName('vagrant:run')
             ->setDescription('Run a vagrant command')
             ->setHelp("")
             ->addCommandArguments();
@@ -42,11 +45,6 @@ class Vagrant extends Command
         $this->inputInterface = $input;
         $this->outputInterface = $output;
         $this->hasDotEnvFile();
-        $vagrantAccessDirectoryCommand = 'cd '.$this->config->getHomesteadBoxPath();
-        if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
-            $vagrantAccessDirectoryCommand = $this->config->getHomesteadAccessDirectoryCommand();
-        }
-        $this->vagrant = new VagrantSupport($vagrantAccessDirectoryCommand);
     }
 
     private function addCommandArguments(){
@@ -57,11 +55,21 @@ class Vagrant extends Command
         );
     }
 
+    private function vagrantRunAction(){
+        if(!empty($this->config->getHomesteadAccessDirectoryCommand())){
+            $accessCommand = $this->config->getHomesteadAccessDirectoryCommand();
+        }else{
+            $accessCommand = 'cd '.$this->config->getHomesteadBoxPath();
+        }
+        return new VagrantRunAction($this->getCommandExecutor(),$accessCommand, $this->action);
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->init($input, $output);
         $this->updateFromOptions();
-        $this->outputInterface->writeLn($this->vagrant->runAction($this->action));
+        $this->outputInterface->writeLn($this->vagrantRunAction()->actionMessage());
+        $this->vagrantRunAction()->run();
         return;
     }
 

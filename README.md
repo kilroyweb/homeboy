@@ -232,10 +232,10 @@ homeboy host --name=my-project --use-defaults --skip-confirmation
 
 ### Vagrant
 
-Homeboy also contains the "vagrant" command, allowing you to quickly run any vagrant command without having to cd into that directory, ie:
+Homeboy also contains the "vagrant:run" command, allowing you to quickly run any vagrant command without having to cd into that directory, ie:
 
 ```
-homeboy vagrant status
+homeboy vagrant:run status
 ```
 
 ### File

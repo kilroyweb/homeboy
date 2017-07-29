@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Commands;
+namespace App\Commands\Composer;
 
 use App\Actions\ComposerCreateProjectAction;
 use App\Configuration\Config;
@@ -97,7 +97,7 @@ class ComposerCreateProject extends Command
         }else{
             $accessCommand = 'cd '.$this->projectDirectory;
         }
-        return new ComposerCreateProjectAction($this->commandExecutor,$accessCommand, $this->composerProject, $this->projectName);
+        return new ComposerCreateProjectAction($this->getCommandExecutor(),$accessCommand, $this->composerProject, $this->projectName);
     }
 
     private function getTaskConfirmationFromQuestion(){
