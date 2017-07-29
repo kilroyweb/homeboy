@@ -7,6 +7,12 @@ use App\Actions\HomesteadAddDatabase;
 use App\Actions\HomesteadMapSite;
 use App\Actions\HostsAddLine;
 use App\Actions\ProvisionHomestead;
+use App\Commands\Options\DatabaseOption;
+use App\Commands\Options\DomainOption;
+use App\Commands\Options\ProjectNameOption;
+use App\Commands\Options\SkipConfirmationOption;
+use App\Commands\Options\UseComposerOption;
+use App\Commands\Options\UseDefaultsOption;
 use App\Configuration\Config;
 use App\Formatters\DatabaseNameFormatter;
 use App\Formatters\DomainFormatter;
@@ -15,7 +21,6 @@ use App\Support\Traits\RequireEnvFile;
 use App\Support\Vagrant\Vagrant;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Host extends Command
@@ -71,47 +76,24 @@ class Host extends Command
         $this->vagrant = new Vagrant($vagrantAccessDirectoryCommand);
     }
 
+    private function addOptionFromClassName($className){
+        $instance = new $className;
+        $this->addOption(
+            $instance->getName(),
+            $instance->getShortcut(),
+            $instance->getMode(),
+            $instance->getDescription(),
+            $instance->getDefault()
+        );
+    }
+
     private function addCommandOptions(){
-        $this->addOption(
-            'use-defaults',
-            null,
-            InputOption::VALUE_NONE,
-            'Ignore questions and use defaults'
-        );
-        $this->addOption(
-            'skip-confirmation',
-            null,
-            InputOption::VALUE_NONE,
-            'Skip Confirmation'
-        );
-        $this->addOption(
-            'use-composer',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Use Composer',
-            null
-        );
-        $this->addOption(
-            'name',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Project Name',
-            null
-        );
-        $this->addOption(
-            'database',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Database',
-            null
-        );
-        $this->addOption(
-            'domain',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Development Domain',
-            null
-        );
+        $this->addOptionFromClassName(UseDefaultsOption::class);
+        $this->addOptionFromClassName(SkipConfirmationOption::class);
+        $this->addOptionFromClassName(UseComposerOption::class);
+        $this->addOptionFromClassName(ProjectNameOption::class);
+        $this->addOptionFromClassName(DatabaseOption::class);
+        $this->addOptionFromClassName(DomainOption::class);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -157,7 +139,7 @@ class Host extends Command
         if($this->inputInterface->getOption('domain')){
             $this->domain = $this->inputInterface->getOption('domain');
         }else{
-            $this->domain = $this->defaultDomainNameFromKey($this->name);
+            $this->domain = DomainFormatter::make($this->name, $this->config->getDomainExtension());
         }
     }
 
@@ -166,7 +148,6 @@ class Host extends Command
         $projectName = 'project-' . time();
         $this->useComposer = $this->config->getUseComposer();
         $this->composerProject = $this->config->getComposerProject();
-
 
         if($this->useDefaults){
 
