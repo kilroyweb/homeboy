@@ -268,6 +268,14 @@ homeboy composer:create-project
 
 ## Troubleshooting
 
+### hosts file is not writable
+
+Your host file will need to be writable by homeboy. In many cases this can be solved with a command like:
+
+```sudo chmod 664 /etc/hosts```
+
+This may vary depending on your platform / environment
+
 ### Homeboy is running composer install within my current directory, rather than my defined LOCAL_SITES_PATH
 
 A common cause of this on Windows is when LOCAL_SITES_PATH is in a different drive than where the homeboy command is being run. Since Windows must first change drives before cd'ing into the directory, you can use the "ACCESS_LOCAL_SITES_DIRECTORY_COMMAND" to overwrite how homeboy accesses this directory. For example:
