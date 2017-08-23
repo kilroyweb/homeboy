@@ -182,7 +182,7 @@ class Host extends Command
                 $this->config->getFolder()
             );
 
-            if ($this->composerProject != 'laravel/laravel') {
+            if (!$this->useComposer || $this->composerProject != 'laravel/laravel') {
                 $this->folderSuffix = $this->interrogator->ask(
                     'Point site to?',
                     $this->config->getFolderSuffix()
