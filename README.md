@@ -1,12 +1,14 @@
 # Homeboy
 
-Tool for automating sites using Laravel Homestead. With one command, Homeboy will:
+Tool for automating sites using Laravel Homestead. With one command, Homeboy will be able to:
 
-- Install Laravel into a new directory via composer
+- Install Laravel (or another project package) into a new directory via composer
 - Update your host file to point your dev domain to your homestead IP
 - Update your Homestead.yaml file mapping to include your new project
 - Update your Homestead.yaml file to create a database for your project
 - Re-provision Vagrant
+
+You can also use homeboy to provision non-laravel websites!
 
 ![](https://j.gifs.com/oYMYNK.gif)
 
